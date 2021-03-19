@@ -115,6 +115,20 @@ export default class Iphone extends React.Component {
 		});      
 	}
 
+	//!still to do the algorithm for selecting the best place to visit from GAPI fetch (parseGResponse)
+	fetchPlaces = (latitude, longitude) => {
+		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[0];
+		console.log(url)
+		$.ajax({
+			url: url,
+			dataType: "jsonp",
+			success : this.parseGResponse,
+			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
+		})
+		// once the data grabbed, hide the button
+		this.setState({ display: false });
+	}
+
 	fetchMap = (latitude,longitude) => {
 		var url = "https://maps.googleapis.com/maps/api/js?key="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
 		$.ajax({
