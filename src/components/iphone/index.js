@@ -1,19 +1,21 @@
 // import preact
 import React from 'react';
 // import stylesheets for ipad & button
-import Navbar from "../burger-menu/navbar";
-import style from './phonestyle.css';
 import ScrollMenu from "react-horizontal-scrolling-menu";
-
-
+import StarfieldAnimation from 'react-starfield-animation';
+import ParticleAnimation from 'react-particle-animation';
+import Particles from "react-tsparticles";
+import 'reactjs-popup/dist/index.css';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import * as DL from 'chartjs-plugin-datalabels';
+
 import Home from '../pages/Home';
 import Reports from '../pages/Reports';
 import Products from '../pages/Products';
 import { Line } from 'react-chartjs-2';
-import * as DL from 'chartjs-plugin-datalabels';
-
-
+import Navbar from "../burger-menu/navbar";
+import style from './phonestyle.css';
+import popup from "../map/popup";
 
 // import jquery for API calls
 import $ from 'jquery';
@@ -66,10 +68,37 @@ export default class Iphone extends React.Component {
 			"zoo"
 		]
 	}
-	
+
+	formatAMPM = (date) => {
+		var hours = date.getHours();
+		var minutes = date.getMinutes();
+		var ampm = hours >= 12 ? 'pm' : 'am';
+		hours = hours % 12;
+		hours = hours ? hours : 12; // the hour '0' should be '12'
+		minutes = minutes < 10 ? '0'+minutes : minutes;
+		var strTime = hours + ':' + minutes + ' ' + ampm;
+		return strTime;
+	}
+	//hi
+
+	parseHResponse = (parsed_json) => {
+		var arr = [];
+		var arr2 = [];
+		for (let index = 0; index < 12; index++) {
+			arr.push(parsed_json['hourly'][index.toString()]['temp']);
+			arr2.push(this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000)));
+		}
+		var now = new Date();
+		var daysOfYear = [];
+		// set states for fields so they could be rendered later on
+		this.setState({
+			hourlyTemp: arr,
+			hourlyTime: arr2,
+		});      
+	}
 
 	parseWResponse = (parsed_json) => {
-		//console.log(parsed_json)
+		
 		var location = parsed_json['name'];
 		var temp_c = Math.round(parsed_json['main']['temp']);
 		var conditions = parsed_json['weather']['0']['description'];
@@ -86,10 +115,35 @@ export default class Iphone extends React.Component {
 		});      
 	}
 
+	fetchMap = (latitude,longitude) => {
+		var url = "https://maps.googleapis.com/maps/api/js?key="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
+		$.ajax({
+			url: url,
+			dataType: "json",
+			success : this.parseHResponse,
+			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
+		})
+		// once the data grabbed, hide the button
+		this.setState({ display: false });
+	}
+
+	fetchHourly = (latitude,longitude) => {
+		var url = "http://api.openweathermap.org/data/2.5/onecall?lat="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
+		$.ajax({
+			url: url,
+			dataType: "json",
+			success : this.parseHResponse,
+			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
+		})
+		// once the data grabbed, hide the button
+		this.setState({ display: false });
+	}
+
 	fetchWeatherData = (latitude, longitude) => {
 		// API URL with a structure of : ttp://api.wunderground.com/api/key/feature/q/country-code/city.json
+		//http://api.openweathermap.org/data/2.5/weather?lat=
 		var url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=Metric&appid="+APIKEY;
-		console.log(url)
+
 		$.ajax({
 			url: url,
 			dataType: "jsonp",
@@ -124,7 +178,7 @@ export default class Iphone extends React.Component {
 			this.setState({longitude: longitude, latitude: lat});
 			console.log('Successfully found you at ' + this.state.latitude + ',' + this.state.longitude);
 			this.fetchWeatherData(this.state.latitude, this.state.longitude);
-			//this.fetchPlaces(this.state.latitude, this.state.longitude);
+			this.fetchHourly(this.state.latitude, this.state.longitude);
 			}, this.errorPosition);
 		}
 	}
@@ -133,14 +187,13 @@ export default class Iphone extends React.Component {
 	// the main render method for the iphone component
 	render() {
 		const data = {
-			labels: ['Now', '1:00am', '2:00am', '3:00am', '4:00am', '5:00am'],
+			labels: this.state.hourlyTime,
 			datasets: [
 				{
-				data: [1,19,9,8,-5,8],
+				data: this.state.hourlyTemp,
 				fill: false,
 				backgroundColor: 'rgb(255,255,255)',
 				borderColor: 'rgba(255,255,255,0.5)',
-				borderDash: [10,5],
 				datalabels: {
 					color: '#FFCE56'
 				}
@@ -175,17 +228,6 @@ export default class Iphone extends React.Component {
 			},
 		}
 
-		const MenuItem = ({ text, selected }) => {
-			return <div className={`menu-item ${selected ? "active" : ""}`}>{text}</div>;
-		};
-			
-		const Menu = (list, selected) =>
-			list.map(el => {
-				const { name } = el;
-			
-				return <MenuItem text={name} key={name} selected={selected} />;
-		});
-
 		// check if temperature data is fetched, if so add the sign styling to the page
 		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
@@ -194,42 +236,40 @@ export default class Iphone extends React.Component {
 		// display all weather data
 		return (
 			<>
+				<StarfieldAnimation
+					style={{
+						pointerEvents: 'none',
+						position: 'absolute',
+						width: '100%',
+						height: '100%',
+					}}
+				/> 
 				<div className={ "container" }>
 					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
 					<div id = "he1" className={ "header"}>
 					<Router>
 						<Navbar/>
-						</Router>
+						<Switch>
+							<Route exact path="/">
+								<div className={ "body" }>
+									<div className={ "city" }>{ this.state.locate }</div>
+									<div className={ "conditions" }>{ this.state.cond }</div>
+									<img className={ "img" } src={'http://openweathermap.org/img/wn/'+this.state.icn+'@4x.png'} onError={console.log("couldn't find icon")}/><div/>
+									<span className={ tempStyles }>{ this.state.temp }</span>
+									<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
+								</div>
+								<br/>
+								<popup/>
+								<div>
+									<Line ref={this.chartReference} data={data} options={options} />
+								</div>
+							</Route>
+							<Route exact path="/reports" component={Products} />
+							<Route exact path="/resetPassword" component={Reports} />
+						</Switch>
+					</Router>
 					</div>
-					<div className={ "body" }>
-						<div className={ "city" }>{ this.state.locate }</div>
-						<div className={ "conditions" }>{ this.state.cond }</div>
-						<img className={ "img" } src={'http://openweathermap.org/img/wn/'+this.state.icn+'@4x.png'} /><div/>
-						<span className={ tempStyles }>{ this.state.temp }</span>
-						<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
-					</div>
-					<br/>
-					<ScrollMenu
-						alignCenter={alignCenter}
-						clickWhenDrag={clickWhenDrag}
-						data={menu}
-						dragging={dragging}
-						hideArrows={hideArrows}
-						hideSingleArrow={hideSingleArrow}
-						onFirstItemVisible={this.onFirstItemVisible}
-						onLastItemVisible={this.onLastItemVisible}
-						onSelect={this.onSelect}
-						onUpdate={this.onUpdate}
-						ref={el => (this.menu = el)}
-						scrollToSelected={scrollToSelected}
-						selected={selected}
-						transition={+transition}
-						translate={translate}
-						wheel={wheel}
-					/>
-					<div>
-						<Line ref={this.chartReference} data={data} options={options} />
-					</div>
+					
 				</div>
 			</>
 		);

@@ -11,6 +11,12 @@ function Navbar() {
 
   const showSidebar = () => setSidebar(!sidebar);
 
+  const Results = () => (
+    <div id="results" className="search-results">
+      Some Results
+    </div>
+  )
+
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>
@@ -28,8 +34,8 @@ function Navbar() {
             </li>
             {SidebarData.map((item, index) => {
               return (
-                <li key={index} className={item.cName}>
-                  <Link to={item.path}>
+                <li key={index} className={item.cName} >
+                  <Link to={item.path} >
                     {item.icon}
                     <span>{item.title}</span>
                   </Link>

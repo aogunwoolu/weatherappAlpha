@@ -2,7 +2,6 @@
 import React from 'react';
 // import stylesheets for ipad & button
 import style from './tabstyle.css';
-import Future from '../reactive-future/future';
 
 
 // import jquery for API calls

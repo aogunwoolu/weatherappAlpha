@@ -10,14 +10,19 @@
 
 	margin: 0 auto;
     color: white;
+
+    
+
+    padding-top: 13px;
 }
+
 .header {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 .body{
-    padding-top: 10px;
+    padding-top: 30px;
 }
 .details {
     flex: 2;

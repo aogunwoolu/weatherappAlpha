@@ -1,6 +1,6 @@
 .navbar {
     background-color: transparent;
-    height: 60px;
+    height: 40px;
     display: flex;
     justify-content: start;
     align-items: center;
@@ -13,7 +13,7 @@
   }
   
   .nav-menu {
-    background-color: #060b26;
+    background-color: rgb(6,11,38,0.9);
     width: 250px;
     height: 1000vh;
     display: flex;
@@ -59,7 +59,7 @@
   }
   
   .navbar-toggle {
-    background-color: #060b26;
+    background-color: rgb(6,11,38,0);
     width: 100%;
     height: 80px;
     display: flex;
