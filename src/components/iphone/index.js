@@ -7,22 +7,21 @@ import ParticleAnimation from 'react-particle-animation';
 import Particles from "react-tsparticles";
 import 'reactjs-popup/dist/index.css';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import * as DL from 'chartjs-plugin-datalabels';
+import datalabels from 'chartjs-plugin-datalabels'
+import { Line } from 'react-chartjs-2';
+
 
 import Home from '../pages/Home';
 import Reports from '../pages/Reports';
 import Products from '../pages/Products';
-import { Line } from 'react-chartjs-2';
 import Navbar from "../burger-menu/navbar";
 import style from './phonestyle.css';
-import popup from "../map/popup";
+import MapContainer from "../map/map";
 
 // import jquery for API calls
 import $ from 'jquery';
 // import the Button component
 import Button from '../button';
-
-var plugin = { DL };
 
 var { DateTime } = require('luxon');;
 
@@ -131,6 +130,7 @@ export default class Iphone extends React.Component {
 
 	fetchMap = (latitude,longitude) => {
 		var url = "https://maps.googleapis.com/maps/api/js?key="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
+		console.log(url)
 		$.ajax({
 			url: url,
 			dataType: "json",
@@ -143,6 +143,7 @@ export default class Iphone extends React.Component {
 
 	fetchHourly = (latitude,longitude) => {
 		var url = "http://api.openweathermap.org/data/2.5/onecall?lat="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
+		
 		$.ajax({
 			url: url,
 			dataType: "json",
@@ -194,12 +195,14 @@ export default class Iphone extends React.Component {
 			this.fetchWeatherData(this.state.latitude, this.state.longitude);
 			this.fetchHourly(this.state.latitude, this.state.longitude);
 			}, this.errorPosition);
+			
 		}
 	}
 
 	
 	// the main render method for the iphone component
 	render() {
+		console.log(this.state.hourlyTemp);
 		const data = {
 			labels: this.state.hourlyTime,
 			datasets: [
@@ -235,16 +238,39 @@ export default class Iphone extends React.Component {
 			maintainAspectRatio: true,
 			legend: { display: false },
 			plugins: {
-			// Change options for ALL labels of THIS CHART
 				datalabels: {
-					color: '#36A2EB'
+					display: true,
+					color: 'white'
 				}
 			},
+			animation: {
+				duration: 0
+			},
+			pan: {
+				enabled: true,
+				mode: "x",
+				speed: 10,
+				threshold: 10,
+			rangeMin: {
+				x: null,
+				y: null
+			},
+			rangeMax: {
+				x: null,
+				y: null
+			}
+			},
+			zoom: {
+				enabled: true,
+				mode: ""
+			}
 		}
 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
+
+		var myLine = new Line('canvas-id', {plugins: [datalabels]});
 		
 		
 		// display all weather data
@@ -274,11 +300,11 @@ export default class Iphone extends React.Component {
 								</div>
 								<br/>
 								<popup/>
-								<div>
-									<Line ref={this.chartReference} data={data} options={options} />
+								<div class="chartAreaWrapper">
+									<Line data={data} options={options} plugins={[datalabels]} />
 								</div>
 							</Route>
-							<Route exact path="/reports" component={Products} />
+							<Route exact path="/settings" component={Products} />
 							<Route exact path="/resetPassword" component={Reports} />
 						</Switch>
 					</Router>
