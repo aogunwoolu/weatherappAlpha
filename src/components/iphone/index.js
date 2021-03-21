@@ -7,6 +7,7 @@ import * as VscIcns from 'react-icons/vsc';
 import ParticleAnimation from 'react-particle-animation';
 import Particles from "react-tsparticles";
 import 'reactjs-popup/dist/index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { withRouter, BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
@@ -16,6 +17,7 @@ import Home from '../pages/Home';
 import Reports from '../pages/Reports';
 import Products from '../pages/Products';
 import Navbar from "../burger-menu/navbar";
+import Days from '../day-prediction/days';
 import style from './phonestyle.css';
 import MapContainer from "../map/map";
 
@@ -363,7 +365,7 @@ export default class Iphone extends React.Component {
 					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
 					<div id = "he1" className={ "header"}>
 					<Router>
-						<Navbar/>
+						<Navbar />
 						<Switch>
 							<Route exact path="/loading">
 								<div style={{position: 'absolute', left: '40%', top: '40%',}}>
@@ -380,11 +382,11 @@ export default class Iphone extends React.Component {
 									<span className={ tempStyles }>{ this.state.temp }</span>
 									<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
 								</div>
-								<br/>
-								<popup/>
 								<div class="chartAreaWrapper">
 									<Line data={data} options={options} plugins={[datalabels,plugins]} />
 								</div>
+								<br/>
+								<Days/>
 							</Route>
 							<Route exact path="/settings" component={Products} />
 							<Route exact path="/resetPassword" component={Reports} />

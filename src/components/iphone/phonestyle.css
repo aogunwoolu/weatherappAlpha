@@ -4,16 +4,13 @@
     background-size:cover;
     background-position:center;
     
-    width: 414px;
-	height: 736px;
+    width: 410px;
+	height: 1236px;
 	text-align: center;
 
 	margin: 0 auto;
     color: white;
 
-    
-
-    padding-top: 13px;
 }
 
 @keyframes spin {
@@ -27,7 +24,7 @@
     flex: 1;
 }
 .body{
-    padding-top: 30px;
+    padding-top: 20px;
 }
 .details {
     flex: 2;
