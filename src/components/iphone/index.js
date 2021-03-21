@@ -7,7 +7,7 @@ import ParticleAnimation from 'react-particle-animation';
 import Particles from "react-tsparticles";
 import 'reactjs-popup/dist/index.css';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import datalabels from 'chartjs-plugin-datalabels'
+import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
 
 
@@ -83,12 +83,14 @@ export default class Iphone extends React.Component {
 	parseHResponse = (parsed_json) => {
 		var arr = [];
 		var arr2 = [];
-		for (let index = 0; index < 12; index++) {
-			arr.push(parsed_json['hourly'][index.toString()]['temp']);
-			arr2.push(this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000)));
+		for (let index = 0; index < 5; index++) {
+			var names = parsed_json['hourly'][index.toString()]['temp'];
+			var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
+
+			arr.push(names);
+			arr2.push(times);
 		}
-		var now = new Date();
-		var daysOfYear = [];
+
 		// set states for fields so they could be rendered later on
 		this.setState({
 			hourlyTemp: arr,
@@ -103,7 +105,6 @@ export default class Iphone extends React.Component {
 		var conditions = parsed_json['weather']['0']['description'];
 		var feelsLike = Math.round(parsed_json['main']['feels_like']);
 		var icon = parsed_json['weather']['0']['icon'];
-		console.log(icon)
 		// set states for fields so they could be rendered later on
 		this.setState({
 			locate: location,
@@ -117,7 +118,6 @@ export default class Iphone extends React.Component {
 	//!still to do the algorithm for selecting the best place to visit from GAPI fetch (parseGResponse)
 	fetchPlaces = (latitude, longitude) => {
 		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[0];
-		console.log(url)
 		$.ajax({
 			url: url,
 			dataType: "jsonp",
@@ -130,7 +130,7 @@ export default class Iphone extends React.Component {
 
 	fetchMap = (latitude,longitude) => {
 		var url = "https://maps.googleapis.com/maps/api/js?key="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
-		console.log(url)
+
 		$.ajax({
 			url: url,
 			dataType: "json",
@@ -191,7 +191,7 @@ export default class Iphone extends React.Component {
 			var lat = position.coords.latitude;
 			var longitude = position.coords.longitude;
 			this.setState({longitude: longitude, latitude: lat});
-			console.log('Successfully found you at ' + this.state.latitude + ',' + this.state.longitude);
+			//console.log('Successfully found you at ' + this.state.latitude + ',' + this.state.longitude);
 			this.fetchWeatherData(this.state.latitude, this.state.longitude);
 			this.fetchHourly(this.state.latitude, this.state.longitude);
 			}, this.errorPosition);
@@ -207,12 +207,16 @@ export default class Iphone extends React.Component {
 			labels: this.state.hourlyTime,
 			datasets: [
 				{
+				pointRadius: 1.5,
+				pointHoverRadius: 0,
 				data: this.state.hourlyTemp,
 				fill: false,
 				backgroundColor: 'rgb(255,255,255)',
 				borderColor: 'rgba(255,255,255,0.5)',
+				borderDash: [5],
+				borderWidth: 1,
 				datalabels: {
-					color: '#FFCE56'
+					color: 'white',
 				}
 				},
 			],
@@ -220,58 +224,76 @@ export default class Iphone extends React.Component {
 		}
 		
 		const options = {
+			tooltips: {enabled: false},
+			events: [],
 			scales: {
 				yAxes: [
 				{
-					display: false,
+					gridLines: {
+						display: false,
+						zeroLineColor: '#ffcc33',
+					},
+					ticks: {
+						display: false 
+					}
 				},
 				],
 				xAxes: [{
 					gridLines: {
-						display: false,
+						display: false, // must be false since we're going to draw our own 'gridlines'!
+						color: 'rgba(255,255,255,0.5)', // can still set the colour.
+						lineWidth: 1 // can still set the width.
 					},
 					ticks: {
                         fontColor: "white",
-					}
+					},
 				}],
+				
 			},
 			maintainAspectRatio: true,
 			legend: { display: false },
 			plugins: {
 				datalabels: {
-					display: true,
-					color: 'white'
+					display: true,	
+					anchor: 'end',
+					align: 'end',
+					offset: '10',
+					formatter: function(value, context) {
+						return Math.round(value) + '°';
+					},
+				},
+				
+			},
+			layout: {
+				padding: {
+					top: 50,
+					right: 20,
 				}
 			},
-			animation: {
-				duration: 0
-			},
-			pan: {
-				enabled: true,
-				mode: "x",
-				speed: 10,
-				threshold: 10,
-			rangeMin: {
-				x: null,
-				y: null
-			},
-			rangeMax: {
-				x: null,
-				y: null
-			}
-			},
-			zoom: {
-				enabled: true,
-				mode: ""
-			}
+		}
+
+		const plugins = {
+			afterRender: function(c, options) {
+				let meta = c.getDatasetMeta(0),max;
+				c.ctx.save();
+				c.ctx.strokeStyle = c.config.options.scales.xAxes[0].gridLines.color;
+				c.ctx.lineWidth = c.config.options.scales.xAxes[0].gridLines.lineWidth;
+				c.ctx.beginPath();
+				meta.data.forEach(function(e) {
+					c.ctx.moveTo(e._model.x, meta.dataset._scale.bottom);
+					c.ctx.lineTo(e._model.x, e._model.y);
+				});
+				c.ctx.textBaseline = 'top';
+				c.ctx.textAlign = 'right';
+				c.ctx.fillStyle = 'black';
+				c.ctx.stroke();
+				c.ctx.restore();
+				}
 		}
 
 		// check if temperature data is fetched, if so add the sign styling to the page
 		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
-
-		var myLine = new Line('canvas-id', {plugins: [datalabels]});
-		
 		
 		// display all weather data
 		return (
@@ -301,7 +323,7 @@ export default class Iphone extends React.Component {
 								<br/>
 								<popup/>
 								<div class="chartAreaWrapper">
-									<Line data={data} options={options} plugins={[datalabels]} />
+									<Line data={data} options={options} plugins={[datalabels,plugins]} />
 								</div>
 							</Route>
 							<Route exact path="/settings" component={Products} />
