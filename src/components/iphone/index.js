@@ -28,6 +28,13 @@ var { DateTime } = require('luxon');;
 const APIKEY = 'bceb51cbee4b751cc43eefea844fa6bf';
 const GAPIKEY = 'AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8';
 
+const TSRegex = new RegExp('.thunderstorm.');
+const DRegex = new RegExp('.drizzle.');
+const RRegex = new RegExp('.rain.');
+const SRegex = new RegExp('.snow.');
+const CRegex = new RegExp('.clear.');
+const CLRegex = new RegExp('.clouds.');
+
 export default class Iphone extends React.Component {
 //var Iphone = React.createClass({
 
@@ -99,7 +106,6 @@ export default class Iphone extends React.Component {
 	}
 
 	parseWResponse = (parsed_json) => {
-		
 		var location = parsed_json['name'];
 		var temp_c = Math.round(parsed_json['main']['temp']);
 		var conditions = parsed_json['weather']['0']['description'];
@@ -115,12 +121,24 @@ export default class Iphone extends React.Component {
 		});      
 	}
 
+	parseGResponse = (parsed_json) => {
+		const val = Math.floor(Math.random() * 11);
+		var rec = Math.round(parsed_json['results'][String(val)]['name']);
+
+		// set states for fields so they could be rendered later on
+		this.setState({
+			recommendation: rec,
+		});      
+	}
+
 	//!still to do the algorithm for selecting the best place to visit from GAPI fetch (parseGResponse)
-	fetchPlaces = (latitude, longitude) => {
-		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[0];
+	fetchPlaces = (latitude, longitude, num) => {
+
+		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[num];
+		console.log(url);
 		$.ajax({
 			url: url,
-			dataType: "jsonp",
+			dataType: "json",
 			success : this.parseGResponse,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
@@ -194,9 +212,31 @@ export default class Iphone extends React.Component {
 			//console.log('Successfully found you at ' + this.state.latitude + ',' + this.state.longitude);
 			this.fetchWeatherData(this.state.latitude, this.state.longitude);
 			this.fetchHourly(this.state.latitude, this.state.longitude);
+			
 			}, this.errorPosition);
 			
 		}
+	}
+
+	//! will get back to sort out the recommendations
+	componentDidMount(){
+		console.log("temp: "+this.state.temp);
+		if (this.state.temp < 10){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [2,3,4,8,10,15,17][Math.floor(Math.random() * 7)]);
+		}
+		else if (10<= this.state.temp < 15){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,23,24,25,26,27][Math.floor(Math.random() * 28)]);
+		}
+		else if (15<= this.state.temp < 20){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [15,23][Math.floor(Math.random() * 2)]);
+		}
+		else if (20<= this.state.temp < 30){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [26,28][Math.floor(Math.random() * 2)]);
+		}
+
+
+		console.log("here: "+this.state.recommendation);
+		this.setState({displayText: "now is the time to visit "+this.state.recommendation});
 	}
 
 	
@@ -316,6 +356,7 @@ export default class Iphone extends React.Component {
 								<div className={ "body" }>
 									<div className={ "city" }>{ this.state.locate }</div>
 									<div className={ "conditions" }>{ this.state.cond }</div>
+									<div className={ "conditions" }>{ this.state.recommendation }</div>
 									<img className={ "img" } src={'http://openweathermap.org/img/wn/'+this.state.icn+'@4x.png'} onError={console.log("couldn't find icon")}/><div/>
 									<span className={ tempStyles }>{ this.state.temp }</span>
 									<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
