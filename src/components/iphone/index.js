@@ -3,10 +3,11 @@ import React from 'react';
 // import stylesheets for ipad & button
 import ScrollMenu from "react-horizontal-scrolling-menu";
 import StarfieldAnimation from 'react-starfield-animation';
+import * as VscIcns from 'react-icons/vsc';
 import ParticleAnimation from 'react-particle-animation';
 import Particles from "react-tsparticles";
 import 'reactjs-popup/dist/index.css';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { withRouter, BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
 
@@ -34,6 +35,8 @@ const RRegex = new RegExp('.rain.');
 const SRegex = new RegExp('.snow.');
 const CRegex = new RegExp('.clear.');
 const CLRegex = new RegExp('.clouds.');
+
+
 
 export default class Iphone extends React.Component {
 //var Iphone = React.createClass({
@@ -73,6 +76,7 @@ export default class Iphone extends React.Component {
 			"stadium",
 			"zoo"
 		]
+		this.redirectTimeout = null;
 	}
 
 	formatAMPM = (date) => {
@@ -188,6 +192,7 @@ export default class Iphone extends React.Component {
 	}
 
 	componentWillMount() {
+		clearTimeout(this.redirectTimeout);
 		this.setState({ 
 			longitude:0,
 			latitude: 0,
@@ -218,25 +223,30 @@ export default class Iphone extends React.Component {
 		}
 	}
 
-	//! will get back to sort out the recommendations
+	//! will get back to sort out the recommendations & loading
 	componentDidMount(){
-		console.log("temp: "+this.state.temp);
-		if (this.state.temp < 10){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [2,3,4,8,10,15,17][Math.floor(Math.random() * 7)]);
-		}
-		else if (10<= this.state.temp < 15){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,23,24,25,26,27][Math.floor(Math.random() * 28)]);
-		}
-		else if (15<= this.state.temp < 20){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [15,23][Math.floor(Math.random() * 2)]);
-		}
-		else if (20<= this.state.temp < 30){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [26,28][Math.floor(Math.random() * 2)]);
-		}
+		// const { history } = this.props;
+		// this.redirectTimeout = setTimeout(() => {
+		// 	history.push('/weather');
+		// }, 5000);
+
+		// console.log("temp: "+this.state.temp);
+		// if (this.state.temp < 10){
+		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [2,3,4,8,10,15,17][Math.floor(Math.random() * 7)]);
+		// }
+		// else if (10<= this.state.temp < 15){
+		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,23,24,25,26,27][Math.floor(Math.random() * 28)]);
+		// }
+		// else if (15<= this.state.temp < 20){
+		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [15,23][Math.floor(Math.random() * 2)]);
+		// }
+		// else if (20<= this.state.temp < 30){
+		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [26,28][Math.floor(Math.random() * 2)]);
+		// }
 
 
-		console.log("here: "+this.state.recommendation);
-		this.setState({displayText: "now is the time to visit "+this.state.recommendation});
+		// console.log("here: "+this.state.recommendation);
+		// this.setState({displayText: "now is the time to visit "+this.state.recommendation});
 	}
 
 	
@@ -335,8 +345,11 @@ export default class Iphone extends React.Component {
 		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
 		
+		
+		
 		// display all weather data
 		return (
+			
 			<>
 				<StarfieldAnimation
 					style={{
@@ -352,6 +365,12 @@ export default class Iphone extends React.Component {
 					<Router>
 						<Navbar/>
 						<Switch>
+							<Route exact path="/loading">
+								<div style={{position: 'absolute', left: '40%', top: '40%',}}>
+									<VscIcns.VscLoading style={{animation: `spin 1s linear infinite`,width: '35%', height: 'auto'}}/>
+									<div className={ "conditions" }>loading your weather</div>
+								</div>
+							</Route>
 							<Route exact path="/">
 								<div className={ "body" }>
 									<div className={ "city" }>{ this.state.locate }</div>

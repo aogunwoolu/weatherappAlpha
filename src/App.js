@@ -2,6 +2,7 @@ import React from 'react'
 
 import Ipad from './components/ipad';
 import Iphone from './components/iphone';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 export default class App extends React.Component {
 //var App = React.createClass({
