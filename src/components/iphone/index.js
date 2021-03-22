@@ -13,16 +13,28 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { withRouter, BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
+import Async from 'react-async';
 
 import Home from '../pages/Home';
 import Reports from '../pages/Reports';
 import Products from '../pages/Products';
 import Navbar from "../burger-menu/navbar";
 import Days from '../day-prediction/days';
+import searchPage from "../searchBar/searchPage"
 import style from './phonestyle.css';
 import MapContainer from "../map/map";
 
 import cloudDay from '../../assets/icons/FewCloudsDay.svg';
+import brokenClouds from '../../assets/icons/BrokenClouds.svg';
+import clearSkyD from '../../assets/icons/ClearSkyDay.svg';
+import clearSkyN from '../../assets/icons/ClearSkyNight.svg';
+import fewCloudsN from '../../assets/icons/FewCloudsNight.svg';
+import mist from '../../assets/icons/Mist.svg';
+import rain from '../../assets/icons/Rain.svg';
+import scatteredClouds from '../../assets/icons/ScatteredClouds.svg';
+import showerRain from '../../assets/icons/ShowerRain.svg';
+import snow from '../../assets/icons/Snow.svg';
+import thunder from '../../assets/icons/ThunderStorm.svg';
 
 // import jquery for API calls
 import $ from 'jquery';
@@ -86,6 +98,8 @@ export default class Iphone extends React.Component {
 		]
 	}
 
+
+
 	formatAMPM = (date) => {
 		var hours = date.getHours();
 		var minutes = date.getMinutes();
@@ -98,7 +112,6 @@ export default class Iphone extends React.Component {
 	}
 
 	parseHResponse = (parsed_json) => {
-		console.log(parsed_json);
 		var arr = [];
 		var arr2 = [];
 		var days = [];
@@ -111,7 +124,7 @@ export default class Iphone extends React.Component {
 		}
 
 		for (let index = 0; index <= 7; index++) {
-			days.push({temp: parsed_json['daily'][index.toString()]['temp']['day'], time: this.formatAMPM(new Date(parsed_json['daily'][index.toString()]['dt'] * 1000)), weather: [{icon: parsed_json['daily'][index.toString()]['weather']['0']['icon']}, {name: parsed_json['daily'][index.toString()]['weather']['0']['main']}]});
+			days.push({'temp': parsed_json['daily'][index.toString()]['temp']['day'], 'time': this.formatAMPM(new Date(parsed_json['daily'][index.toString()]['dt'] * 1000)), 'weather': [{icon: parsed_json['daily'][index.toString()]['weather']['0']['icon']}, {'name': parsed_json['daily'][index.toString()]['weather']['0']['main']}]});
 		}
 
 		// set states for fields so they could be rendered later on
@@ -149,41 +162,47 @@ export default class Iphone extends React.Component {
 	}
 
 	//!still to do the algorithm for selecting the best place to visit from GAPI fetch (parseGResponse)
-	fetchPlaces = (latitude, longitude, num) => {
-
+	fetchPlaces = async(latitude, longitude, num) => {
 		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[num];
+		
+		await
 		$.ajax({
 			url: url,
 			dataType: "json",
 			success : this.parseGResponse,
+			async: true,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
 		// once the data grabbed, hide the button
 		this.setState({ display: false });
 	}
 
-	fetchHourly = (latitude,longitude) => {
+	fetchHourly = async(latitude,longitude) => {
 		var url = "http://api.openweathermap.org/data/2.5/onecall?lat="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
 		
+		await
 		$.ajax({
 			url: url,
 			dataType: "json",
 			success : this.parseHResponse,
+			async: true,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
 		// once the data grabbed, hide the button
 		this.setState({ display: false });
 	}
 
-	fetchWeatherData = (latitude, longitude) => {
+	fetchWeatherData = async(latitude, longitude) => {
 		// API URL with a structure of : ttp://api.wunderground.com/api/key/feature/q/country-code/city.json
 		//http://api.openweathermap.org/data/2.5/weather?lat=
 		var url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=Metric&appid="+APIKEY;
 
+		await
 		$.ajax({
 			url: url,
 			dataType: "jsonp",
 			success : this.parseWResponse,
+			async: true,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
 		// once the data grabbed, hide the button
@@ -202,7 +221,8 @@ export default class Iphone extends React.Component {
 			temp: 0,
 			cond : "", 
 			icn: "",
-			recNum: 0
+			recNum: 0,
+			futureDays: [],
 		});
 
 		if (!navigator.geolocation){
@@ -217,8 +237,25 @@ export default class Iphone extends React.Component {
 			this.fetchWeatherData(this.state.latitude, this.state.longitude);
 			this.fetchHourly(this.state.latitude, this.state.longitude);
 			
+
+		console.log("temp: "+this.state.temp);
+		if (this.state.temp < 10){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [2,3,4,8,10,15,17][Math.floor(Math.random() * 7)]);
+		}
+		else if (10<= this.state.temp < 15){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,23,24,25,26,27][Math.floor(Math.random() * 28)]);
+		}
+		else if (15<= this.state.temp < 20){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [15,23][Math.floor(Math.random() * 2)]);
+		}
+		else if (20<= this.state.temp < 30){
+			this.fetchPlaces(this.state.latitude, this.state.longitude, [26,28][Math.floor(Math.random() * 2)]);
+		}
+
+
+		console.log("here: "+this.state.recommendation);
+		this.setState({displayText: "now is the time to visit "+this.state.recommendation});
 			}, this.errorPosition);
-			
 		}
 	}
 
@@ -228,7 +265,7 @@ export default class Iphone extends React.Component {
 
 	pickBG(){
 		if (!(this.isDay())){
-			return bg[2];
+			return bg[1];
 		}
 		else if (SRegex.test(this.state.cond)){
 			return bg[1];
@@ -248,23 +285,7 @@ export default class Iphone extends React.Component {
 		// 	history.push('/weather');
 		// }, 5000);
 
-		// console.log("temp: "+this.state.temp);
-		// if (this.state.temp < 10){
-		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [2,3,4,8,10,15,17][Math.floor(Math.random() * 7)]);
-		// }
-		// else if (10<= this.state.temp < 15){
-		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,23,24,25,26,27][Math.floor(Math.random() * 28)]);
-		// }
-		// else if (15<= this.state.temp < 20){
-		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [15,23][Math.floor(Math.random() * 2)]);
-		// }
-		// else if (20<= this.state.temp < 30){
-		// 	this.fetchPlaces(this.state.latitude, this.state.longitude, [26,28][Math.floor(Math.random() * 2)]);
-		// }
-
-
-		// console.log("here: "+this.state.recommendation);
-		// this.setState({displayText: "now is the time to visit "+this.state.recommendation});
+		
 	}
 
 	
@@ -365,6 +386,8 @@ export default class Iphone extends React.Component {
 		// display all weather data
 		return (
 			<>
+			{
+				(!(this.isDay()))? (
 				<StarfieldAnimation
 					style={{
 						pointerEvents: 'none',
@@ -373,6 +396,8 @@ export default class Iphone extends React.Component {
 						height: '100%',
 					}}
 				/> 
+				) : null
+	}
 				<div className={ 'container '+this.pickBG() }>
 					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
 					<div id = "he1" className={ "header"}>
@@ -389,7 +414,7 @@ export default class Iphone extends React.Component {
 								<div className={ "body" }>
 									<div className={ "conditions" }><strong>{ this.state.cond }</strong></div>
 									<div className={ "conditions" }>{ this.state.recommendation }</div>
-									<div className={ "conditions" }>it's hot outside, do whatever</div>
+									<div className={ "conditions" }>{this.state.recommendation}</div>
 									<div className={"floatOVer"}>
 										<img className={ "fimg" } src={cloudDay} onError={console.log("couldn't find icon")}/>
 										<div className={"floating"}>
@@ -399,20 +424,20 @@ export default class Iphone extends React.Component {
 												<Line data={data} options={options} plugins={[datalabels,plugins]} />
 											</div>
 											<div className={ "swipe" }>
-												<AiIcns.AiOutlineLine/>
+												<AiIcns.AiOutlineMinus/>
 											</div>
 											<br/>
-											<Days data={this.state.futureDays}/>
+											<br/>
+											<br/>
+											<Days futureDays={this.state.futureDays}/>
+											<p>more information</p>
 										</div>
-										
 									</div>
 								</div>
-								
 								<br/>
-								
 							</Route>
 							<Route exact path="/settings" component={Products} />
-							<Route exact path="/resetPassword" component={Reports} />
+							<Route exact path="/search" component={searchPage} />
 						</Switch>
 					</Router>
 					</div>

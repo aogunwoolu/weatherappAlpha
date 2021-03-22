@@ -3,7 +3,7 @@
     background-size:cover;
     background-position:center;
     
-    width: 414px;
+    width: 425px;
 	height: 1236px;
 	text-align: center;
 
@@ -95,7 +95,7 @@
 
 .fimg{
     pointer-events: 'none';
-    margin-top: -40px;
+    margin-top: -20px;
     float: center;
 }
 

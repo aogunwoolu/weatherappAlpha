@@ -1,33 +1,10 @@
 import React from 'react';
 import Day from './day';
 import ScrollMenu from "react-horizontal-scrolling-menu";
+import {useState} from "react";
 
 let list = [
-    { name: "item1" },
-    { name: "item2" },
-    { name: "item3" },
-    { name: "item4" },
-    { name: "item5" },
-    { name: "item6" },
-    { name: "item7" },
-    { name: "item8" },
-    { name: "item9" },
-    { name: "item10" },
-    { name: "item11" },
-    { name: "item12" },
-    { name: "item13" },
-    { name: "item14" },
-    { name: "item15" },
-    { name: "item16" },
-    { name: "item17" },
-    { name: "item18" },
-    { name: "item19" },
-    { name: "item20" },
-    { name: "item21" },
-    { name: "item22" },
-    { name: "item23" },
-    { name: "item24" },
-    { name: "item25" }
+
 ];
 
 const MenuItem = ({ text, selected }) => {
@@ -36,9 +13,8 @@ const MenuItem = ({ text, selected }) => {
 
 export const Menu = (list, selected) =>
     list.map(el => {
-    const { name } = el;
 
-    return <Day text={name} key={name} selected={selected} />;
+    return <Day text={el["name"]} temp={el["temp"]} icn={el["img"]} dsc={el["desc"]} key={el["name"]} selected={selected} />;
 });
 
 class Days extends React.Component {
@@ -56,18 +32,57 @@ class Days extends React.Component {
         wheel: true
     };
 
-    constructor(props) {
+    curr = new Date; // get current 
+    first = this.curr.getDate() - this.curr.getDay();
+
+    constructor(props, futureDays) {
         super(props);
         this.menu = null;
-        this.menuItems = Menu(list.slice(0, list.length), this.state.selected);
+        
     }
 
-    componentDidUpdate(prevProps, prevState) {
-    const { alignCenter } = prevState;
-    const { alignCenter: alignCenterNew } = this.state;
-    if (alignCenter !== alignCenterNew) {
-        this.menu.setInitial();
+    refreshDays(prevState){
+        // const { alignCenter } = prevState;
+        // const { alignCenter: alignCenterNew } = this.state;
+
+        // if (alignCenter !== alignCenterNew) {
+        //     this.menu.setInitial();
+        // }
+
+        var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        for (var i = 1; i <= 8; i++) {
+
+            var next = new Date(this.curr.getTime());
+            next.setDate(this.first + i);
+            //console.log(this.props.futureDays['temp'])
+            //next.setDate(this.first + i);
+            
+            try{
+                list.push({name: days[next.getDay()], temp: this.props.futureDays[i]['temp'], img: this.props.futureDays[i]['weather'][0]['icon'], desc: this.props.futureDays[i]['weather'][1]['name']})
+            }
+            catch{
+
+            }
+        }
+        this.menuItems = Menu(list.slice(1, 8), this.state.selected);
     }
+
+    // componentWillMount(){
+    //     if (this.state.previstate !==undefined){
+    //         this.refreshDays(this.state.previstate);
+    //     }
+    // }
+
+    componentDidUpdate(prevProps, prevState) {
+        
+
+        console.log(list.length);
+        
+        if (this.props.futureDays !== null || list.length === 0){
+            //this.setState({previstate: prevState});
+            this.refreshDays(prevState);
+        }
     }
 
     render(){
@@ -75,12 +90,11 @@ class Days extends React.Component {
 
     return (
         <>
+            <p>this week's preditions</p>
             <ScrollMenu 
                 scrollBy='1'
                 data={menu}
-                wrapperStyle={{
-                    left: '150px',
-                }}
+                itemStyle=""
             />
             
         </>

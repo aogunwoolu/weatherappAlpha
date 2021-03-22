@@ -11,13 +11,22 @@ import { IconContext } from 'react-icons';
 function Navbar() {
   const [sidebar, setSidebar] = useState(false);
 
-  const showSidebar = () => setSidebar(!sidebar);
+  const showSidebar = () => {
+    setSidebar(!sidebar); 
+    // if (sidebar){
+    //   refreshPage();
+    // }
+  };
 
   const Results = () => (
     <div id="results" className="search-results">
       Some Results
     </div>
   )
+
+  const refreshPage = () => {
+    window.location.reload(false);
+  }
 
   return (
     <>
@@ -34,7 +43,8 @@ function Navbar() {
                 <AiIcons.AiOutlineClose />
               </Link>
             </li>
-            {SidebarData.map((item, index) => {
+            {
+            SidebarData.map((item, index) => {
               return (
                 <li key={index} className={item.cName} >
                   <Link to={item.path} >
