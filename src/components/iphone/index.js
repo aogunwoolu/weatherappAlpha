@@ -26,8 +26,6 @@ import cloudDay from '../../assets/icons/FewCloudsDay.svg';
 
 // import jquery for API calls
 import $ from 'jquery';
-// import the Button component
-import Button from '../button';
 
 var { DateTime } = require('luxon');;
 
@@ -43,9 +41,9 @@ const CLRegex = new RegExp('.clouds.');
 
 const bg = [
 	"rain",
-	"day",
 	"night",
 	"sunset",
+	"day",
 ];
 
 export default class Iphone extends React.Component {
@@ -86,8 +84,6 @@ export default class Iphone extends React.Component {
 			"stadium",
 			"zoo"
 		]
-
-		this.redirectTimeout = null;
 	}
 
 	formatAMPM = (date) => {
@@ -100,7 +96,6 @@ export default class Iphone extends React.Component {
 		var strTime = hours + ':' + minutes + ' ' + ampm;
 		return strTime;
 	}
-	//hi
 
 	parseHResponse = (parsed_json) => {
 		console.log(parsed_json);
@@ -157,24 +152,10 @@ export default class Iphone extends React.Component {
 	fetchPlaces = (latitude, longitude, num) => {
 
 		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[num];
-		console.log(url);
 		$.ajax({
 			url: url,
 			dataType: "json",
 			success : this.parseGResponse,
-			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
-		})
-		// once the data grabbed, hide the button
-		this.setState({ display: false });
-	}
-
-	fetchMap = (latitude,longitude) => {
-		var url = "https://maps.googleapis.com/maps/api/js?key="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
-
-		$.ajax({
-			url: url,
-			dataType: "json",
-			success : this.parseHResponse,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
 		// once the data grabbed, hide the button
@@ -249,10 +230,10 @@ export default class Iphone extends React.Component {
 		if (!(this.isDay())){
 			return bg[2];
 		}
-		else if (SRegex.test(this.state.conditions)){
+		else if (SRegex.test(this.state.cond)){
 			return bg[1];
 		}
-		else if (DRegex.test(this.state.conditions)||RRegex.test(this.state.conditions)||CLRegex.test(this.state.conditions)||TSRegex.test(this.state.conditions)){
+		else if (DRegex.test(this.state.cond)||RRegex.test(this.state.cond)||CLRegex.test(this.state.cond)||TSRegex.test(this.state.cond)){
 			return bg[0];
 		}
 		else{
@@ -392,7 +373,7 @@ export default class Iphone extends React.Component {
 						height: '100%',
 					}}
 				/> 
-				<div className={ 'container '+this.pickBG() } id="moveBack">
+				<div className={ 'container '+this.pickBG() }>
 					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
 					<div id = "he1" className={ "header"}>
 					<Router>

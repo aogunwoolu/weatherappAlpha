@@ -95,8 +95,7 @@
 
 .fimg{
     pointer-events: 'none';
-    margin-top: -20px;
-    z-index: -1000;
+    margin-top: -40px;
     float: center;
 }
 
