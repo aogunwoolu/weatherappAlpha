@@ -4,6 +4,8 @@ import React from 'react';
 import ScrollMenu from "react-horizontal-scrolling-menu";
 import StarfieldAnimation from 'react-starfield-animation';
 import * as VscIcns from 'react-icons/vsc';
+import * as AiIcns from 'react-icons/ai';
+
 import ParticleAnimation from 'react-particle-animation';
 import Particles from "react-tsparticles";
 import 'reactjs-popup/dist/index.css';
@@ -12,7 +14,6 @@ import { withRouter, BrowserRouter as Router, Switch, Route } from 'react-router
 import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
 
-
 import Home from '../pages/Home';
 import Reports from '../pages/Reports';
 import Products from '../pages/Products';
@@ -20,6 +21,8 @@ import Navbar from "../burger-menu/navbar";
 import Days from '../day-prediction/days';
 import style from './phonestyle.css';
 import MapContainer from "../map/map";
+
+import cloudDay from '../../assets/icons/FewCloudsDay.svg';
 
 // import jquery for API calls
 import $ from 'jquery';
@@ -38,7 +41,12 @@ const SRegex = new RegExp('.snow.');
 const CRegex = new RegExp('.clear.');
 const CLRegex = new RegExp('.clouds.');
 
-
+const bg = [
+	"rain",
+	"day",
+	"night",
+	"sunset",
+];
 
 export default class Iphone extends React.Component {
 //var Iphone = React.createClass({
@@ -78,6 +86,7 @@ export default class Iphone extends React.Component {
 			"stadium",
 			"zoo"
 		]
+
 		this.redirectTimeout = null;
 	}
 
@@ -94,8 +103,10 @@ export default class Iphone extends React.Component {
 	//hi
 
 	parseHResponse = (parsed_json) => {
+		console.log(parsed_json);
 		var arr = [];
 		var arr2 = [];
+		var days = [];
 		for (let index = 0; index < 5; index++) {
 			var names = parsed_json['hourly'][index.toString()]['temp'];
 			var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
@@ -104,10 +115,15 @@ export default class Iphone extends React.Component {
 			arr2.push(times);
 		}
 
+		for (let index = 0; index <= 7; index++) {
+			days.push({temp: parsed_json['daily'][index.toString()]['temp']['day'], time: this.formatAMPM(new Date(parsed_json['daily'][index.toString()]['dt'] * 1000)), weather: [{icon: parsed_json['daily'][index.toString()]['weather']['0']['icon']}, {name: parsed_json['daily'][index.toString()]['weather']['0']['main']}]});
+		}
+
 		// set states for fields so they could be rendered later on
 		this.setState({
 			hourlyTemp: arr,
 			hourlyTime: arr2,
+			futureDays: days,
 		});      
 	}
 
@@ -225,6 +241,25 @@ export default class Iphone extends React.Component {
 		}
 	}
 
+	isDay() {
+		return (Date.now() + 60000 * new Date().getTimezoneOffset() + 21600000) % 86400000 / 3600000 > 12;
+	}
+
+	pickBG(){
+		if (!(this.isDay())){
+			return bg[2];
+		}
+		else if (SRegex.test(this.state.conditions)){
+			return bg[1];
+		}
+		else if (DRegex.test(this.state.conditions)||RRegex.test(this.state.conditions)||CLRegex.test(this.state.conditions)||TSRegex.test(this.state.conditions)){
+			return bg[0];
+		}
+		else{
+			return bg[3];
+		}
+	}
+
 	//! will get back to sort out the recommendations & loading
 	componentDidMount(){
 		// const { history } = this.props;
@@ -254,7 +289,6 @@ export default class Iphone extends React.Component {
 	
 	// the main render method for the iphone component
 	render() {
-		console.log(this.state.hourlyTemp);
 		const data = {
 			labels: this.state.hourlyTime,
 			datasets: [
@@ -347,11 +381,8 @@ export default class Iphone extends React.Component {
 		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
 		
-		
-		
 		// display all weather data
 		return (
-			
 			<>
 				<StarfieldAnimation
 					style={{
@@ -361,7 +392,7 @@ export default class Iphone extends React.Component {
 						height: '100%',
 					}}
 				/> 
-				<div className={ "container" }>
+				<div className={ 'container '+this.pickBG() } id="moveBack">
 					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
 					<div id = "he1" className={ "header"}>
 					<Router>
@@ -375,18 +406,29 @@ export default class Iphone extends React.Component {
 							</Route>
 							<Route exact path="/">
 								<div className={ "body" }>
-									<div className={ "city" }>{ this.state.locate }</div>
-									<div className={ "conditions" }>{ this.state.cond }</div>
+									<div className={ "conditions" }><strong>{ this.state.cond }</strong></div>
 									<div className={ "conditions" }>{ this.state.recommendation }</div>
-									<img className={ "img" } src={'http://openweathermap.org/img/wn/'+this.state.icn+'@4x.png'} onError={console.log("couldn't find icon")}/><div/>
-									<span className={ tempStyles }>{ this.state.temp }</span>
-									<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
+									<div className={ "conditions" }>it's hot outside, do whatever</div>
+									<div className={"floatOVer"}>
+										<img className={ "fimg" } src={cloudDay} onError={console.log("couldn't find icon")}/>
+										<div className={"floating"}>
+											<span className={ tempStyles }>{ this.state.temp }</span>
+											<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
+											<div class="chartAreaWrapper">
+												<Line data={data} options={options} plugins={[datalabels,plugins]} />
+											</div>
+											<div className={ "swipe" }>
+												<AiIcns.AiOutlineLine/>
+											</div>
+											<br/>
+											<Days data={this.state.futureDays}/>
+										</div>
+										
+									</div>
 								</div>
-								<div class="chartAreaWrapper">
-									<Line data={data} options={options} plugins={[datalabels,plugins]} />
-								</div>
+								
 								<br/>
-								<Days/>
+								
 							</Route>
 							<Route exact path="/settings" component={Products} />
 							<Route exact path="/resetPassword" component={Reports} />

@@ -7,7 +7,7 @@
   }
   
   .menu-bars {
-    margin-left: 2rem;
+    margin-top: -0.2rem;
     font-size: 2rem;
     background: none;
   }
@@ -27,6 +27,7 @@
   .nav-menu.active {
     left: 0;
     transition: 350ms;
+    z-index: 999999999;
   }
   
   .nav-text {
@@ -68,5 +69,5 @@
   }
   
   span {
-    margin-left: 16px;
+    margin-left: 19px;
   }

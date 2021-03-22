@@ -1,16 +1,40 @@
 .container { 
-    background-image: url('../../assets/backgrounds/PlainSunset.svg');
     background-repeat:no-repeat;
     background-size:cover;
     background-position:center;
     
-    width: 410px;
+    width: 414px;
 	height: 1236px;
 	text-align: center;
 
 	margin: 0 auto;
     color: white;
 
+    
+}
+
+#moveBack{
+    z-index: 100000000;
+}
+
+.night{
+    background-image: url("../../assets/backgrounds/Night.svg");
+}
+
+.day{
+    background-image: url("../../assets/backgrounds/DaySunSnow.svg");
+}
+
+.rain{
+    background-image: url("../../assets/backgrounds/DayCloudRain.svg");
+}
+
+.sunset{
+    background-image: url("../../assets/backgrounds/PlainSunset.svg");
+}
+
+.sunrise{
+    background-image: url("../../assets/backgrounds/Sunrise.svg");
 }
 
 @keyframes spin {
@@ -18,14 +42,16 @@
     to {transform:rotate(360deg);}
 }
 
+.fimg{
+    z-index: -1;
+}
+
 .header {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
-.body{
-    padding-top: 20px;
-}
+
 .details {
     flex: 2;
 }
@@ -48,7 +74,7 @@
     margin-top: 0;
     font-size: 5.2em;
     font-weight: 300;
-    letter-spacing: -12px;
+    letter-spacing: -7px;
 }
 .filled:after {
     content: "°";
@@ -58,4 +84,40 @@
     display: inline-block;
     padding-top: 10px;
     vertical-align: top;
+}
+
+.starfield{
+    pointer-events: 'none';
+    position: 'absolute';
+    width: '100%';
+    height: '100%';
+}
+
+.fimg{
+    pointer-events: 'none';
+    margin-top: -20px;
+    z-index: -1000;
+    float: center;
+}
+
+.floatOVer{
+    pointer-events: 'none';
+    width: 390px;
+    height: 200px;
+    position: relative;
+}
+
+.floating{
+    float: center;
+    position: absolute;
+    top: 270px;
+    width: inherit;
+    z-index: 1000;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+.swipe{
+    position: absolute;
+    right: 20px;
 }
