@@ -13,6 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { withRouter, BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
+import Places from "google-places-web";
 import Async from 'react-async';
 
 import Home from '../pages/Home';
@@ -23,11 +24,12 @@ import Days from '../day-prediction/days';
 import searchPage from "../searchBar/searchPage"
 import style from './phonestyle.css';
 import MapContainer from "../map/map";
+import Sun from "../sun/sun";
 
 import cloudDay from '../../assets/icons/FewCloudsDay.svg';
+import clearSkyN from '../../assets/icons/ClearSkyNight.svg';
 import brokenClouds from '../../assets/icons/BrokenClouds.svg';
 import clearSkyD from '../../assets/icons/ClearSkyDay.svg';
-import clearSkyN from '../../assets/icons/ClearSkyNight.svg';
 import fewCloudsN from '../../assets/icons/FewCloudsNight.svg';
 import mist from '../../assets/icons/Mist.svg';
 import rain from '../../assets/icons/Rain.svg';
@@ -44,12 +46,12 @@ var { DateTime } = require('luxon');;
 const APIKEY = 'bceb51cbee4b751cc43eefea844fa6bf';
 const GAPIKEY = 'AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8';
 
-const TSRegex = new RegExp('.thunderstorm.');
-const DRegex = new RegExp('.drizzle.');
-const RRegex = new RegExp('.rain.');
-const SRegex = new RegExp('.snow.');
-const CRegex = new RegExp('.clear.');
-const CLRegex = new RegExp('.clouds.');
+const TSRegex = /(.*)thunderstorm(.*)/;
+const DRegex = /(.*)drizzle(.*)/;
+const RRegex = /(.*)rain(.*)/;
+const SRegex = /(.*)snow(.*)/;
+const CRegex = /(.*)clear(.*)/;
+const CLRegex = /(.*)clouds(.*)/;
 
 const bg = [
 	"rain",
@@ -57,6 +59,9 @@ const bg = [
 	"sunset",
 	"day",
 ];
+
+// Places.apiKey = "AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8";
+// Places.debug = true; // boolean;
 
 export default class Iphone extends React.Component {
 //var Iphone = React.createClass({
@@ -98,7 +103,41 @@ export default class Iphone extends React.Component {
 		]
 	}
 
+	iconSorter = () => {
+		var cond = this.state.cond
+		console.log("cond: "+cond);
+		console.log(CLRegex.test(cond));
 
+		if (TSRegex.test(cond)){
+			return thunder
+		}
+		else if (CRegex.test(cond)){
+			return (this.isDay())? clearSkyD:clearSkyN;
+		}
+		else if (CLRegex.test(cond)){
+			if (/(.*)few(.*)/.test(cond)){
+				return (this.isDay())? cloudDay:fewCloudsN;
+			}
+			else if (/(.*)scattered(.*)/.test(cond)){
+				return scatteredClouds;
+			}
+			else if (/(.*)broken(.*)/.test(cond)||/(.*)overcast(.*)/.test(cond)){
+				return brokenClouds;
+			}
+		}
+		else if (/(.*)mist(.*)/.test(cond)){
+			return mist;
+		}
+		else if (DRegex.test(cond)){
+			return showerRain;
+		}
+		else if (RRegex.test(cond)){
+			return rain;
+		}
+		else if (SRegex.test(cond)){
+			return snow;
+		}
+	}
 
 	formatAMPM = (date) => {
 		var hours = date.getHours();
@@ -163,18 +202,33 @@ export default class Iphone extends React.Component {
 
 	//!still to do the algorithm for selecting the best place to visit from GAPI fetch (parseGResponse)
 	fetchPlaces = async(latitude, longitude, num) => {
-		var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[num];
+		// var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[num];
 		
-		await
-		$.ajax({
-			url: url,
-			dataType: "json",
-			success : this.parseGResponse,
-			async: true,
-			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
-		})
-		// once the data grabbed, hide the button
-		this.setState({ display: false });
+		// await
+		// $.ajax({
+		// 	url: url,
+		// 	dataType: "json",
+		// 	success : this.parseGResponse,
+		// 	async: true,
+		// 	error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
+		// })
+		// // once the data grabbed, hide the button
+		// this.setState({ display: false });
+
+
+
+		// try {
+		// 	const response = await Places.nearbysearch({
+		// 	  location: "-37.814,144.96332", // LatLon delimited by ,
+		// 	  radius: "500",  // Radius cannot be used if rankBy set to DISTANCE
+		// 	  type: [], // Undefined type will return all types
+		// 	  rankby: "distance" // See google docs for different possible values
+		// 	});
+		   
+		// 	const { status, results, next_page_token, html_attributions } = response;
+		//   } catch (error) {
+		// 	console.log(error);
+		//   }
 	}
 
 	fetchHourly = async(latitude,longitude) => {
@@ -396,7 +450,9 @@ export default class Iphone extends React.Component {
 						height: '100%',
 					}}
 				/> 
-				) : null
+				) : (
+					null// <Sun/>
+				)
 	}
 				<div className={ 'container '+this.pickBG() }>
 					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
@@ -416,7 +472,7 @@ export default class Iphone extends React.Component {
 									<div className={ "conditions" }>{ this.state.recommendation }</div>
 									<div className={ "conditions" }>{this.state.recommendation}</div>
 									<div className={"floatOVer"}>
-										<img className={ "fimg" } src={cloudDay} onError={console.log("couldn't find icon")}/>
+										<img className={ "fimg" } src={this.iconSorter()} onError={console.log("couldn't find icon")}/>
 										<div className={"floating"}>
 											<span className={ tempStyles }>{ this.state.temp }</span>
 											<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>

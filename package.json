@@ -9,6 +9,7 @@
     "bootstrap": "^4.6.0",
     "chartjs-plugin-datalabels": "^0.7.0",
     "google-maps-react": "^2.0.6",
+    "google-places-web": "^1.0.1",
     "jquery": "^3.6.0",
     "luxon": "^1.26.0",
     "react": "^17.0.1",
