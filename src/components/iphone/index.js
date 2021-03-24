@@ -18,10 +18,11 @@ import Async from 'react-async';
 
 import Home from '../pages/Home';
 import Reports from '../pages/Reports';
-import Products from '../pages/Products';
+import About from '../pages/about';
 import Navbar from "../burger-menu/navbar";
 import Days from '../day-prediction/days';
-import searchPage from "../searchBar/searchPage"
+import SearchPage from "../searchBar/searchPage"
+import SavedPage from "../pages/saved"
 import style from './phonestyle.css';
 import MapContainer from "../map/map";
 import Sun from "../sun/sun";
@@ -41,7 +42,7 @@ import thunder from '../../assets/icons/ThunderStorm.svg';
 // import jquery for API calls
 import $ from 'jquery';
 
-var { DateTime } = require('luxon');;
+var { DateTime } = require('luxon');
 
 const APIKEY = 'bceb51cbee4b751cc43eefea844fa6bf';
 const GAPIKEY = 'AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8';
@@ -277,6 +278,8 @@ export default class Iphone extends React.Component {
 			icn: "",
 			recNum: 0,
 			futureDays: [],
+
+			savedLocations: [],
 		});
 
 		if (!navigator.geolocation){
@@ -340,6 +343,11 @@ export default class Iphone extends React.Component {
 		// }, 5000);
 
 		
+	}
+
+	handleCallback = (childData) =>{
+		console.log("child dataaaaaaaaaaaaaaaaaaaaa: "+JSON.stringify(childData));
+		this.state.savedLocations.push(childData);
 	}
 
 	
@@ -451,7 +459,7 @@ export default class Iphone extends React.Component {
 					}}
 				/> 
 				) : (
-					null// <Sun/>
+					null//<Sun/>
 				)
 	}
 				<div className={ 'container '+this.pickBG() }>
@@ -492,8 +500,9 @@ export default class Iphone extends React.Component {
 								</div>
 								<br/>
 							</Route>
-							<Route exact path="/settings" component={Products} />
-							<Route exact path="/search" component={searchPage} />
+							<Route exact path="/about" component={About} />
+							<Route exact path="/search" render={(props) => (<SearchPage {...props} parentCallback = {this.handleCallback}/>)} />
+							<Route exact path="/saved" render={(props) => (<SavedPage {...props} saved={this.state.savedLocations}/>)} />
 						</Switch>
 					</Router>
 					</div>

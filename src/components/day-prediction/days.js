@@ -7,10 +7,6 @@ let list = [
 
 ];
 
-const MenuItem = ({ text, selected }) => {
-    return <div className={`menu-item ${selected ? "active" : ""}`}>{text}</div>;
-};
-
 export const Menu = (list, selected) =>
     list.map(el => {
 
@@ -33,15 +29,14 @@ class Days extends React.Component {
     };
 
     curr = new Date; // get current 
-    first = this.curr.getDate() - this.curr.getDay();
 
-    constructor(props, futureDays) {
+    constructor(props) {
         super(props);
         this.menu = null;
-        
+        this.refreshDays();
     }
 
-    refreshDays(prevState){
+    refreshDays(){
         // const { alignCenter } = prevState;
         // const { alignCenter: alignCenterNew } = this.state;
 
@@ -51,12 +46,11 @@ class Days extends React.Component {
 
         var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        for (var i = 1; i <= 8; i++) {
+        list = []
+        for (var i = 0; i <= 7; i++) {
 
-            var next = new Date(this.curr.getTime());
-            next.setDate(this.first + i);
-            //console.log(this.props.futureDays['temp'])
-            //next.setDate(this.first + i);
+            var next = new Date();
+            next.setDate(this.curr.getDate() + i);
             
             try{
                 list.push({name: days[next.getDay()], temp: this.props.futureDays[i]['temp'], img: this.props.futureDays[i]['weather'][0]['icon'], desc: this.props.futureDays[i]['weather'][1]['name']})
@@ -68,24 +62,12 @@ class Days extends React.Component {
         this.menuItems = Menu(list.slice(1, 8), this.state.selected);
     }
 
-    // componentWillMount(){
-    //     if (this.state.previstate !==undefined){
-    //         this.refreshDays(this.state.previstate);
-    //     }
-    // }
-
     componentDidUpdate(prevProps, prevState) {
-        
-
-        console.log(list.length);
-        
-        if (this.props.futureDays !== null || list.length === 0){
-            //this.setState({previstate: prevState});
-            this.refreshDays(prevState);
-        }
+        this.refreshDays();
     }
 
     render(){
+    this.refreshDays();
     const menu = this.menuItems;
 
     return (
