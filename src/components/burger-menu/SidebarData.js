@@ -1,5 +1,6 @@
 import React from 'react';
 import * as FaIcons from 'react-icons/fa';
+import * as FiIcons from 'react-icons/fi';
 import * as AiIcons from 'react-icons/ai';
 import * as IoIcons from 'react-icons/io';
 
@@ -15,6 +16,13 @@ export const SidebarData = [
     title: 'Settings',
     path: '/settings',
     icon: <FaIcons.FaCog />,
+    cName: 'nav-text',
+    colour: 'white'
+  },
+  {
+    title: 'Map',
+    path: '/map',
+    icon: <FiIcons.FiMap/>,
     cName: 'nav-text',
     colour: 'white'
   },

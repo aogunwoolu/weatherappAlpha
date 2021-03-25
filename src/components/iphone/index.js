@@ -515,6 +515,7 @@ export default class Iphone extends React.Component {
 								<br/>
 							</Route>
 							<Route exact path="/about" component={About} />
+							<Route exact path="/map" component={Map} />
 							<Route exact path="/search" render={(props) => (<SearchPage {...props} parentCallback = {this.handleCallback}/>)} />
 							<Route exact path="/saved" render={(props) => (<SavedPage {...props} saved={this.state.savedLocations}/>)} />
 						</Switch>
