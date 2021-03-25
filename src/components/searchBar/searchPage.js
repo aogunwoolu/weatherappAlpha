@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng
@@ -292,8 +292,23 @@ const SearchPage = (props) => {
 
   const handleClick =(e)=> {
     props.parentCallback({"name": address, "lat": coordinates.lat, "lng": coordinates.lng});
+    let locs = JSON.parse(localStorage.getItem('savedLocs'));
+    locs.push({"name": address, "lat": coordinates.lat, "lng": coordinates.lng});
+    localStorage.setItem('savedLocs',JSON.stringify(locs));
     e.preventDefault();
   }
+
+  useEffect( () => {
+    console.log(props);
+    if (props.location.loc != undefined){
+      setAddress(props.location.loc.name);
+      setCoordinates({lat: props.location.loc.lat, lng: props.location.loc.lng});
+      setdataGot(true);
+
+      fetchWeatherData(props.location.loc.lat, props.location.loc.lng);
+      fetchHourly(props.location.loc.lat, props.location.loc.lng);
+    }
+  }, []);
   
   return (
     <div>

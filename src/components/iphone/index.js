@@ -102,6 +102,8 @@ export default class Iphone extends React.Component {
 			"stadium",
 			"zoo"
 		]
+
+		if (localStorage.getItem('savedLocs') === null){localStorage.setItem('savedLocs',JSON.stringify([]))}
 	}
 
 	iconSorter = () => {
@@ -345,9 +347,21 @@ export default class Iphone extends React.Component {
 		
 	}
 
+	containsObject(obj, list) {
+		var i;
+		for (i = 0; i < list.length; i++) {
+			if (list[i].name === obj.name) {
+				return true;
+			}
+		}
+	
+		return false;
+	}
+
 	handleCallback = (childData) =>{
-		console.log("child dataaaaaaaaaaaaaaaaaaaaa: "+JSON.stringify(childData));
-		this.state.savedLocations.push(childData);
+		if (!this.containsObject(childData,this.state.savedLocations)){
+			this.state.savedLocations.push(childData);
+		}
 	}
 
 	
