@@ -7,7 +7,7 @@
     background-position:center;
     
     width: 414px;
-	height: 1236px;
+	height: 1450px;
 	text-align: center;
 
 	margin: 0 auto;
@@ -97,7 +97,13 @@
 
 .fimg{
     pointer-events: 'none';
-    margin-top: -20px;
+    margin-top: -25px;
+    float: center;
+}
+
+.fimg2{
+    pointer-events: 'none';
+    margin-top: -100px;
     float: center;
 }
 
@@ -108,10 +114,27 @@
     position: relative;
 }
 
+.floatOVer2{
+    pointer-events: 'none';
+    width: 390px;
+    height: 200px;
+    position: relative;
+}
+
+.floating2{
+    float: center;
+    position: absolute;
+    top: 210px;
+    width: inherit;
+    z-index: 1000;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
 .floating{
     float: center;
     position: absolute;
-    top: 300px;
+    top: 270px;
     width: inherit;
     z-index: 1000;
     color: #FFFFFF;
@@ -150,17 +173,56 @@
     to{border-right-color: transparent;}
 }
 
-.searchContainer {
-    display: flex;
-  }
-  
-  .one {
-    borderRadius: 500px;
-    flex: 0 0 5%;
+.autoComplete{
+    position:relative;
+}
+
+.one {
+    position: absolute;
+    z-index: 10;
+    top: 35px;
+    right: 235px;
   }
   
   .two {
-    flex: 1;
+    height: 35px;
+    width: 109%;
+    margin-left: 1px;
     borderRadius: 25px;
     textAlign: center;
   }
+
+.split{
+    display:flex;
+}
+
+.left{
+    margin-left: 8px;
+    flex: 1;
+}
+.right{
+    flex: 1;
+}
+
+.itm p:first-of-type{
+    background: -webkit-linear-gradient(#ffffff, rgb(228, 228, 228));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.one:active{
+    animation: colorchange 0.5s ease-in infinite;
+    animation: pulse 0.5s ease-in infinite;
+}
+
+@keyframes pulse{
+    25%  {transform: scale(0.9);}
+    75%  {transform: scale(1.1);}
+}
+
+@keyframes colorchange
+{
+    0% { color: rgb(0, 61, 61); }
+    50% { color: rgb(0, 143, 143); }
+    100% { color: rgb(0, 61, 61); }
+}

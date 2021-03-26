@@ -18,16 +18,6 @@ function Navbar() {
     // }
   };
 
-  const Results = () => (
-    <div id="results" className="search-results">
-      Some Results
-    </div>
-  )
-
-  const refreshPage = () => {
-    window.location.reload(false);
-  }
-
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>

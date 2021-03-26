@@ -6,6 +6,10 @@ import PlacesAutocomplete, {
 import datalabels from 'chartjs-plugin-datalabels';
 import * as AiIcns from 'react-icons/ai';
 import * as BiIcns from 'react-icons/bi';
+import * as FaIcns from 'react-icons/fa';
+import * as WiIcns from 'react-icons/wi';
+import * as RiIcns from 'react-icons/ri';
+import * as MdIcns from 'react-icons/md';
 import { Line } from 'react-chartjs-2';
 import Days from '../day-prediction/days';
 import Button from 'react-bootstrap/Button';
@@ -49,6 +53,14 @@ const SearchPage = (props) => {
 		cond : "",
 		fLike: 0,
 		icn: null,
+		sunriseSunset: "",
+		humidity: 0,
+		pressure: 0,
+		min: 0,
+		max: 0,
+		vis: 0,
+		wind: 0,
+		clouds: 0,
   });
   const [futureData, setFutureData] = React.useState({
     hourlyTemp: [],
@@ -153,11 +165,21 @@ const SearchPage = (props) => {
 	}
 
 	const parseWResponse = (parsed_json) => {
-		var location = parsed_json['name'];
-		var temp_c = Math.round(parsed_json['main']['temp']);
-		var conditions = parsed_json['weather']['0']['description'];
-		var feelsLike = Math.round(parsed_json['main']['feels_like']);
-		var icon = parsed_json['weather']['0']['icon'];
+		let location = parsed_json['name'];
+		let temp_c = Math.round(parsed_json['main']['temp']);
+		let conditions = parsed_json['weather']['0']['description'];
+		let feelsLike = Math.round(parsed_json['main']['feels_like']);
+		let icon = parsed_json['weather']['0']['icon'];
+
+		let humidity = parsed_json['main']['humidity'];
+		let pressure = parsed_json['main']['pressure'];
+		let min =  Math.round(parsed_json['main']['temp_min']);
+		let max = Math.round(parsed_json['main']['temp_max']);
+		let vis = parsed_json['visibility'];
+		let wind = parsed_json['wind'];
+		let clouds = parsed_json['clouds']['all'];
+
+		let sunriseSunset = {sunrise: parsed_json['sys']['sunrise'], sunset: parsed_json['sys']['sunset']}
 		// set states for fields so they could be rendered later on
 		setWeatherData({
 			locate: location,
@@ -165,6 +187,14 @@ const SearchPage = (props) => {
 			cond : conditions,
 			fLike: feelsLike,
 			icn: icon,
+			sunriseSunset: sunriseSunset,
+			humidity: humidity,
+			pressure: pressure,
+			min: min,
+			max: max,
+			vis: vis,
+			wind: wind,
+			clouds: clouds,
 		});      
 	}
 
@@ -300,7 +330,7 @@ const SearchPage = (props) => {
 
   useEffect( () => {
     console.log(props);
-    if (props.location.loc != undefined){
+    if (props.location.loc !== undefined){
       setAddress(props.location.loc.name);
       setCoordinates({lat: props.location.loc.lat, lng: props.location.loc.lng});
       setdataGot(true);
@@ -320,16 +350,16 @@ const SearchPage = (props) => {
         {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
           <div style={{
             float: 'center',
-            position: 'absolute',
-            top: '-5px',
-            left: '100px',
+            position: 'relative',
+            top: '-50px',
+            left: '70px',
             color: '#FFFFFF',
             width: '210pt',
             zIndex: '100',
           }}>
             <br/>
             <section className="searchContainer">
-              <Button onClick={handleClick} className="one" style={{borderRadius: '500px'}} variant="dark">save</Button>
+              <h3><FaIcns.FaSave onClick={handleClick} className="one" style={{color:"black"}}/></h3>
               <input className="two" id="input" style={{borderRadius: "25px",textAlign: "center",}} {...getInputProps({ placeholder: "Type address" })} />
             </section>
 
@@ -355,13 +385,11 @@ const SearchPage = (props) => {
       <br/>
       {
         (dataGot)? (
-          <>
-            <div className={ "conditions" }><strong>{ weatherData.cond }</strong></div>
-              <div className={ "conditions" }>{ weatherData.recommendation }</div>
-              <div className={ "conditions" }>{weatherData.recommendation}</div>
-              <div className={"floatOVer"}>
-                <img className={ "fimg" } src={iconSorter()} onError={console.log("couldn't find icon")}/>
-                <div className={"floating"}>
+          <div className={ "body" }>
+            <div className={ "conditions2" }><strong>{ weatherData.cond }</strong></div>
+              <div className={"floatOVer2"}>
+                <img className={ "fimg2" } src={iconSorter()} onError={console.log("couldn't find icon")}/>
+                <div className={"floating2"}>
                   <span className={ tempStyles }>{ weatherData.temp }</span>
                   <div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
                   <div class="chartAreaWrapper">
@@ -373,14 +401,27 @@ const SearchPage = (props) => {
                   <br/>
                   <br/>
                   <br/>
-                  {console.log(futureData.futureDays)}
                   <Days futureDays={futureData.futureDays}/>
                   <p>more information</p>
+                  <div className="info">
+												<div className="split">
+													<div className="left">
+														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{weatherData.humidity}%</p></div>
+														<div className="itm"><p><WiIcns.WiBarometer/>pressure</p><p>{weatherData.pressure}hPa</p></div>
+														<div className="itm"><p><RiIcns.RiArrowUpDownFill/>min/max</p><p>{weatherData.min}°/{weatherData.max}°</p></div>
+													</div>
+													<div className="right">
+														<div className="itm"><p><MdIcns.MdVisibility/>visibility</p><p>{weatherData.vis}m</p></div>
+														<div className="itm"><p><WiIcns.WiHumidity/>wind</p><p>100000</p></div>
+														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{weatherData.humidity}%</p></div>
+													</div>
+												</div>
+											</div>
                 </div>
               </div>
-            </>
+            </div>
             ):(
-              <div style={{margin: '50%'}}>
+              <div>
                 <p style={{textAlign: 'center'}}>type a place</p>
                 <BiIcns.BiConfused/>
               </div>

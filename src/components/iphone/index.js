@@ -6,6 +6,9 @@ import StarfieldAnimation from 'react-starfield-animation';
 import SwipeableViews from 'react-swipeable-views';
 import * as VscIcns from 'react-icons/vsc';
 import * as AiIcns from 'react-icons/ai';
+import * as WiIcns from 'react-icons/wi';
+import * as RiIcns from 'react-icons/ri';
+import * as MdIcns from 'react-icons/md';
 
 import ParticleAnimation from 'react-particle-animation';
 import Particles from "react-tsparticles";
@@ -25,7 +28,7 @@ import Days from '../day-prediction/days';
 import SearchPage from "../searchBar/searchPage"
 import SavedPage from "../pages/saved"
 import style from './phonestyle.css';
-import MapContainer from "../map/map";
+import Suggestions from "../pages/map";
 import Sun from "../sun/sun";
 
 import cloudDay from '../../assets/icons/FewCloudsDay.svg';
@@ -61,6 +64,12 @@ const bg = [
 	"sunset",
 	"day",
 ];
+
+const tooltips = [
+	"want recomendations? maps tab!",
+	"love to save? check out saved~",
+	"don't forget to scroll!"
+]
 
 // Places.apiKey = "AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8";
 // Places.debug = true; // boolean;
@@ -179,18 +188,36 @@ export default class Iphone extends React.Component {
 	}
 
 	parseWResponse = (parsed_json) => {
-		var location = parsed_json['name'];
-		var temp_c = Math.round(parsed_json['main']['temp']);
-		var conditions = parsed_json['weather']['0']['description'];
-		var feelsLike = Math.round(parsed_json['main']['feels_like']);
-		var icon = parsed_json['weather']['0']['icon'];
+		let location = parsed_json['name'];
+		let temp_c = Math.round(parsed_json['main']['temp']);
+		let conditions = parsed_json['weather']['0']['description'];
+		let feelsLike = Math.round(parsed_json['main']['feels_like']);
+		let icon = parsed_json['weather']['0']['icon'];
+
+		let humidity = parsed_json['main']['humidity'];
+		let pressure = parsed_json['main']['pressure'];
+		let min =  Math.round(parsed_json['main']['temp_min']);
+		let max = Math.round(parsed_json['main']['temp_max']);
+		let vis = parsed_json['visibility'];
+		let wind = parsed_json['wind'];
+		let clouds = parsed_json['clouds']['all'];
+
+		let sunriseSunset = {sunrise: parsed_json['sys']['sunrise'], sunset: parsed_json['sys']['sunset']}
 		// set states for fields so they could be rendered later on
 		this.setState({
 			locate: location,
 			temp: temp_c,
 			cond : conditions,
 			fLike: feelsLike,
-			icn: icon
+			icn: icon,
+			sunriseSunset: sunriseSunset,
+			humidity: humidity,
+			pressure: pressure,
+			min: min,
+			max: max,
+			vis: vis,
+			wind: wind,
+			clouds: clouds,
 		});      
 	}
 
@@ -202,37 +229,6 @@ export default class Iphone extends React.Component {
 		this.setState({
 			recommendation: rec,
 		});      
-	}
-
-	//!still to do the algorithm for selecting the best place to visit from GAPI fetch (parseGResponse)
-	fetchPlaces = async(latitude, longitude, num) => {
-		// var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key="+GAPIKEY+"&location="+latitude+","+longitude+"&radius=5000&type="+this.recType[num];
-		
-		// await
-		// $.ajax({
-		// 	url: url,
-		// 	dataType: "json",
-		// 	success : this.parseGResponse,
-		// 	async: true,
-		// 	error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
-		// })
-		// // once the data grabbed, hide the button
-		// this.setState({ display: false });
-
-
-
-		// try {
-		// 	const response = await Places.nearbysearch({
-		// 	  location: "-37.814,144.96332", // LatLon delimited by ,
-		// 	  radius: "500",  // Radius cannot be used if rankBy set to DISTANCE
-		// 	  type: [], // Undefined type will return all types
-		// 	  rankby: "distance" // See google docs for different possible values
-		// 	});
-		   
-		// 	const { status, results, next_page_token, html_attributions } = response;
-		//   } catch (error) {
-		// 	console.log(error);
-		//   }
 	}
 
 	fetchHourly = async(latitude,longitude) => {
@@ -254,6 +250,7 @@ export default class Iphone extends React.Component {
 		// API URL with a structure of : ttp://api.wunderground.com/api/key/feature/q/country-code/city.json
 		//http://api.openweathermap.org/data/2.5/weather?lat=
 		var url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=Metric&appid="+APIKEY;
+		console.log(url);
 
 		await
 		$.ajax({
@@ -272,6 +269,7 @@ export default class Iphone extends React.Component {
 		this.setState({ 
 			longitude:0,
 			latitude: 0,
+			textIdx: Math.floor(Math.random() * tooltips.length),
 
 			temp: "",
 			display: true,
@@ -298,23 +296,6 @@ export default class Iphone extends React.Component {
 			this.fetchHourly(this.state.latitude, this.state.longitude);
 			
 
-		console.log("temp: "+this.state.temp);
-		if (this.state.temp < 10){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [2,3,4,8,10,15,17][Math.floor(Math.random() * 7)]);
-		}
-		else if (10<= this.state.temp < 15){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,23,24,25,26,27][Math.floor(Math.random() * 28)]);
-		}
-		else if (15<= this.state.temp < 20){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [15,23][Math.floor(Math.random() * 2)]);
-		}
-		else if (20<= this.state.temp < 30){
-			this.fetchPlaces(this.state.latitude, this.state.longitude, [26,28][Math.floor(Math.random() * 2)]);
-		}
-
-
-		console.log("here: "+this.state.recommendation);
-		this.setState({displayText: "now is the time to visit "+this.state.recommendation});
 			}, this.errorPosition);
 		}
 	}
@@ -340,12 +321,14 @@ export default class Iphone extends React.Component {
 
 	//! will get back to sort out the recommendations & loading
 	componentDidMount(){
-		// const { history } = this.props;
-		// this.redirectTimeout = setTimeout(() => {
-		// 	history.push('/weather');
-		// }, 5000);
+		this.timeout = setInterval(() => {
+			let currentIdx = this.state.textIdx;
+			this.setState({ textIdx: currentIdx + 1 });
+		}, 300000);
+	}
 
-		
+	componentDidUnmount() {
+		clearInterval(this.timeout);
 	}
 
 	containsObject(obj, list) {
@@ -459,6 +442,7 @@ export default class Iphone extends React.Component {
 		// check if temperature data is fetched, if so add the sign styling to the page
 		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
+		let textThatChanges = tooltips[this.state.textIdx % tooltips.length];
 		
 		// display all weather data
 		return (
@@ -492,8 +476,7 @@ export default class Iphone extends React.Component {
 							<Route exact path="/">
 								<div className={ "body" }>
 									<div className={ "conditions" }><strong>{ this.state.cond }</strong></div>
-									<div className={ "conditions" }>{ this.state.recommendation }</div>
-									<div className={ "conditions" }>{this.state.recommendation}</div>
+									<div className={ "conditions" }>{textThatChanges}</div>
 									<div className={"floatOVer"}>
 										<img className={ "fimg" } src={this.iconSorter()} onError={console.log("couldn't find icon")}/>
 										<div className={"floating"}>
@@ -524,13 +507,27 @@ export default class Iphone extends React.Component {
 											<br/>
 											<Days futureDays={this.state.futureDays}/>
 											<p>more information</p>
+											<div className="info">
+												<div className="split">
+													<div className="left">
+														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{this.state.humidity}%</p></div>
+														<div className="itm"><p><WiIcns.WiBarometer/>pressure</p><p>{this.state.pressure}hPa</p></div>
+														<div className="itm"><p><RiIcns.RiArrowUpDownFill/>min/max</p><p>{this.state.min}°/{this.state.max}°</p></div>
+													</div>
+													<div className="right">
+														<div className="itm"><p><MdIcns.MdVisibility/>visibility</p><p>{this.state.vis}m</p></div>
+														<div className="itm"><p><WiIcns.WiHumidity/>wind</p><p>100000</p></div>
+														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{this.state.humidity}%</p></div>
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
 								<br/>
 							</Route>
 							<Route exact path="/about" component={About} />
-							<Route exact path="/map" component={Map} />
+							<Route exact path="/map" component={Suggestions} />
 							<Route exact path="/search" render={(props) => (<SearchPage {...props} parentCallback = {this.handleCallback}/>)} />
 							<Route exact path="/saved" render={(props) => (<SavedPage {...props} saved={this.state.savedLocations}/>)} />
 						</Switch>
