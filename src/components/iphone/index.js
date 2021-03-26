@@ -3,6 +3,7 @@ import React from 'react';
 // import stylesheets for ipad & button
 import ScrollMenu from "react-horizontal-scrolling-menu";
 import StarfieldAnimation from 'react-starfield-animation';
+import SwipeableViews from 'react-swipeable-views';
 import * as VscIcns from 'react-icons/vsc';
 import * as AiIcns from 'react-icons/ai';
 
@@ -498,9 +499,23 @@ export default class Iphone extends React.Component {
 										<div className={"floating"}>
 											<span className={ tempStyles }>{ this.state.temp }</span>
 											<div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
-											<div class="chartAreaWrapper">
-												<Line data={data} options={options} plugins={[datalabels,plugins]} />
-											</div>
+											<SwipeableViews>
+                                                <div style={Object.assign({})}>
+                                                    <div class="chartAreaWrapper">
+                                                        <Line data={data} options={options} plugins={[datalabels,plugins]} />
+                                                    </div>
+                                                </div>
+                                                <div style={Object.assign({})}>
+                                                    <div class="chartAreaWrapper">
+                                                        <Line data={data} options={options} plugins={[datalabels,plugins]} />
+                                                    </div>
+                                                </div>
+                                                <div style={Object.assign({})}>
+                                                    <div class="chartAreaWrapper">
+                                                        <Line data={data} options={options} plugins={[datalabels,plugins]} />
+                                                    </div>
+                                                </div>
+                                            </SwipeableViews>
 											<div className={ "swipe" }>
 												<AiIcns.AiOutlineMinus/>
 											</div>

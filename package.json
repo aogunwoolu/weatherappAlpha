@@ -23,6 +23,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-starfield-animation": "^1.0.1",
+    "react-swipeable-views": "^0.13.9",
     "react-tsparticles": "^1.22.0",
     "reactjs-popup": "^2.0.4",
     "web-vitals": "^1.1.1"
