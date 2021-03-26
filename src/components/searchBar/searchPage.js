@@ -173,8 +173,8 @@ const SearchPage = (props) => {
 
 		let humidity = parsed_json['main']['humidity'];
 		let pressure = parsed_json['main']['pressure'];
-		let min =  Math.round(parsed_json['main']['temp_min']);
-		let max = Math.round(parsed_json['main']['temp_max']);
+		let min =  parsed_json['main']['temp_min']
+		let max = parsed_json['main']['temp_max']
 		let vis = parsed_json['visibility'];
 		let wind = parsed_json['wind'];
 		let clouds = parsed_json['clouds']['all'];
@@ -323,9 +323,12 @@ const SearchPage = (props) => {
   const handleClick =(e)=> {
     props.parentCallback({"name": address, "lat": coordinates.lat, "lng": coordinates.lng});
     let locs = JSON.parse(localStorage.getItem('savedLocs'));
-    locs.push({"name": address, "lat": coordinates.lat, "lng": coordinates.lng});
-    localStorage.setItem('savedLocs',JSON.stringify(locs));
-    e.preventDefault();
+    if (address != ""){
+      locs.push({"name": address, "lat": coordinates.lat, "lng": coordinates.lng});
+      localStorage.setItem('savedLocs',JSON.stringify(locs));
+      e.preventDefault();
+    }
+    
   }
 
   useEffect( () => {
@@ -412,8 +415,8 @@ const SearchPage = (props) => {
 													</div>
 													<div className="right">
 														<div className="itm"><p><MdIcns.MdVisibility/>visibility</p><p>{weatherData.vis}m</p></div>
-														<div className="itm"><p><WiIcns.WiHumidity/>wind</p><p>100000</p></div>
-														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{weatherData.humidity}%</p></div>
+														<div className="itm"><p><WiIcns.WiStrongWind/>wind</p><p>100000</p></div>
+														<div className="itm"><p><WiIcns.WiCloud/>cloudiness</p><p>{weatherData.clouds}%</p></div>
 													</div>
 												</div>
 											</div>

@@ -1,3 +1,11 @@
 import React from 'react';
-export default class Suggestions extends React.Component {
+
+function Products() {
+  return (
+    <div className='products'>
+      <h1>Map</h1>
+    </div>
+  );
 }
+
+export default Products;

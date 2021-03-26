@@ -188,8 +188,8 @@
     height: 35px;
     width: 109%;
     margin-left: 1px;
-    borderRadius: 25px;
-    textAlign: center;
+    border-radius: 25px;
+    text-align: center;
   }
 
 .split{

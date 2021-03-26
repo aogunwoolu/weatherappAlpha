@@ -9,7 +9,7 @@ function About() {
             <strong>LIBRARIES USED</strong>
             <p>+React<br/>+ChartJS<br/>+React Bootstrap<br/>+etc.</p>
             <strong>SPECIAL THANKS</strong>
-            <p>+Tony Cui<br/>+Jamie Ives<br/>+You!</p>
+            <p>+You!</p>
         </>
     )
 }

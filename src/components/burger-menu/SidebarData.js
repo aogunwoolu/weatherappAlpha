@@ -13,13 +13,6 @@ export const SidebarData = [
     colour: '#ff8cf9'
   },
   {
-    title: 'Settings',
-    path: '/settings',
-    icon: <FaIcons.FaCog />,
-    cName: 'nav-text',
-    colour: 'white'
-  },
-  {
     title: 'Map',
     path: '/map',
     icon: <FiIcons.FiMap/>,
