@@ -12,7 +12,6 @@ import * as RiIcns from 'react-icons/ri';
 import * as MdIcns from 'react-icons/md';
 import { Line } from 'react-chartjs-2';
 import Days from '../day-prediction/days';
-import Button from 'react-bootstrap/Button';
 
 import cloudDay from '../../assets/icons/FewCloudsDay.svg';
 import clearSkyN from '../../assets/icons/ClearSkyNight.svg';
@@ -37,12 +36,12 @@ const CRegex = /(.*)clear(.*)/;
 const CLRegex = /(.*)clouds(.*)/;
 var { DateTime } = require('luxon');
 
-const bg = [
-	"rain",
-	"night",
-	"sunset",
-	"day",
-];
+// const bg = [
+// 	"rain",
+// 	"night",
+// 	"sunset",
+// 	"day",
+// ];
 
 const SearchPage = (props) => {
   const [dataGot, setdataGot] = React.useState(false);

@@ -1,7 +1,6 @@
 import React from 'react'
 
 import Iphone from './components/iphone';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 export default class App extends React.Component {
 	/*

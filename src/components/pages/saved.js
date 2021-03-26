@@ -3,16 +3,39 @@ import { Link } from 'react-router-dom';
 import { Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as TiIcons from 'react-icons/ti';
+import * as ImIcons from 'react-icons/im';
 
 const SavedPage = (props) => {
-    //console.log("saveddata: "+JSON.stringify(props.saved));
+    const [del, setDelete] = React.useState(false);
     var loc = JSON.parse(localStorage.getItem('savedLocs'));
+    console.log(loc);
     
     const data = loc.map(el => {
-        console.log("saveddata: "+JSON.stringify(el));
-        return el;//<Day text={el["name"]} temp={el["temp"]} icn={el["img"]} dsc={el["desc"]} key={el["name"]} selected={selected} />;
-})
-    //const data =[{"name":"test1"},{"name":"test2"}];
+        return el;
+    })
+
+    const containsObject = (obj, list) => {
+		var i;
+		for (i = 0; i < list.length; i++) {
+			if (list[i].name == obj) {
+				return i;
+			}
+		}
+	
+		return false;
+	}
+
+    const deleteTheLoc =(name)=> {
+        let contains = containsObject(name, loc);
+        console.log(contains);
+        //if (contains == false){return;}
+        if (contains > -1){
+            loc.splice(contains, 1);
+        }
+        localStorage.setItem('savedLocs',JSON.stringify(loc));
+        window.location.reload(false);
+    }
+
     const listItems = data.map((d) => 
     <li style={{listStyleType: 'none'}}>
         <Link to={{pathname:'/search', loc: d}}>
@@ -23,11 +46,23 @@ const SavedPage = (props) => {
             </Card.Body>
             </Card>
         </Link>
-    </li>);
+        {
+                (del)? (
+                    <ImIcons.ImCross onClick={() => deleteTheLoc(d.name)}/>
+                ): null
+                
+            }
+    </li>)
+    ;
+
+    const handleClick =(e)=> {
+        setDelete(!del);
+    }
 
     return (
         <>
             <h1>saves</h1>
+            <h3><ImIcons.ImBin onClick={handleClick}/></h3>
             <div style={{marginTop: '10px'}}>
             {listItems }
             </div>

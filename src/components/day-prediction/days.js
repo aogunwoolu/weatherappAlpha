@@ -1,33 +1,18 @@
 import React from 'react';
 import Day from './day';
 import ScrollMenu from "react-horizontal-scrolling-menu";
-import {useState} from "react";
 
 let list = [
 
 ];
 
-export const Menu = (list, selected) =>
+export const Menu = (list) =>
     list.map(el => {
 
-    return <Day text={el["name"]} temp={el["temp"]} icn={el["img"]} dsc={el["desc"]} key={el["name"]} selected={selected} />;
+    return <Day text={el["name"]} temp={el["temp"]} icn={el["img"]} dsc={el["desc"]} key={el["name"]} />;
 });
 
 class Days extends React.Component {
-    state = {
-        alignCenter: true,
-        clickWhenDrag: false,
-        dragging: true,
-        hideArrows: true,
-        hideSingleArrow: true,
-        itemsCount: list.length,
-        scrollToSelected: false,
-        selected: "item1",
-        translate: 0,
-        transition: 0.3,
-        wheel: true
-    };
-
     curr = new Date; // get current 
 
     constructor(props) {
@@ -37,13 +22,6 @@ class Days extends React.Component {
     }
 
     refreshDays(){
-        // const { alignCenter } = prevState;
-        // const { alignCenter: alignCenterNew } = this.state;
-
-        // if (alignCenter !== alignCenterNew) {
-        //     this.menu.setInitial();
-        // }
-
         var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         list = []
@@ -59,7 +37,7 @@ class Days extends React.Component {
 
             }
         }
-        this.menuItems = Menu(list.slice(1, 8), this.state.selected);
+        this.menuItems = Menu(list.slice(1, 8));
     }
 
     componentDidUpdate(prevProps, prevState) {

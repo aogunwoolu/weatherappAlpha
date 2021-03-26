@@ -1,7 +1,7 @@
-// import preact
+// import react
 import React from 'react';
-// import stylesheets for ipad & button
-import ScrollMenu from "react-horizontal-scrolling-menu";
+
+//importing modules (and external CSS files)
 import StarfieldAnimation from 'react-starfield-animation';
 import SwipeableViews from 'react-swipeable-views';
 import * as VscIcns from 'react-icons/vsc';
@@ -9,19 +9,14 @@ import * as AiIcns from 'react-icons/ai';
 import * as WiIcns from 'react-icons/wi';
 import * as RiIcns from 'react-icons/ri';
 import * as MdIcns from 'react-icons/md';
-
-import ParticleAnimation from 'react-particle-animation';
-import Particles from "react-tsparticles";
 import 'reactjs-popup/dist/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { withRouter, BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import datalabels from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
-import Places from "google-places-web";
-import Async from 'react-async';
+import $ from 'jquery';
 
-import Home from '../pages/Home';
-import Reports from '../pages/Reports';
+//internal imports
 import About from '../pages/about';
 import Navbar from "../burger-menu/navbar";
 import Days from '../day-prediction/days';
@@ -29,8 +24,8 @@ import SearchPage from "../searchBar/searchPage"
 import SavedPage from "../pages/saved"
 import style from './phonestyle.css';
 import Suggestions from "../pages/map";
-import Sun from "../sun/sun";
 
+//image imports
 import cloudDay from '../../assets/icons/FewCloudsDay.svg';
 import clearSkyN from '../../assets/icons/ClearSkyNight.svg';
 import brokenClouds from '../../assets/icons/BrokenClouds.svg';
@@ -43,14 +38,13 @@ import showerRain from '../../assets/icons/ShowerRain.svg';
 import snow from '../../assets/icons/Snow.svg';
 import thunder from '../../assets/icons/ThunderStorm.svg';
 
-// import jquery for API calls
-import $ from 'jquery';
-
+//importing date for later use
 var { DateTime } = require('luxon');
 
+//API keys for openweather + google APIs
 const APIKEY = 'bceb51cbee4b751cc43eefea844fa6bf';
-const GAPIKEY = 'AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8';
 
+//regular expressions to check against conditions (in multiple places)
 const TSRegex = /(.*)thunderstorm(.*)/;
 const DRegex = /(.*)drizzle(.*)/;
 const RRegex = /(.*)rain(.*)/;
@@ -58,6 +52,7 @@ const SRegex = /(.*)snow(.*)/;
 const CRegex = /(.*)clear(.*)/;
 const CLRegex = /(.*)clouds(.*)/;
 
+//background style names
 const bg = [
 	"rain",
 	"night",
@@ -65,57 +60,26 @@ const bg = [
 	"day",
 ];
 
+//tool tips (to guide users to the features)
 const tooltips = [
 	"want recomendations? maps tab!",
 	"love to save? check out saved~",
 	"don't forget to scroll!"
 ]
 
-// Places.apiKey = "AIzaSyDdfgXMyKCCD9FKeYF77xlldUVfVmiXDZ8";
-// Places.debug = true; // boolean;
-
+//main iphone class
 export default class Iphone extends React.Component {
 //var Iphone = React.createClass({
 
 	// a constructor with initial set states
 	constructor(props){
 		super(props);
-		// temperature state
-		// button display state
-		this.recType = [
-			"tourist_attraction",
-			"amusement_park",
-			"aquarium",
-			"art_gallery",
-			"bakery",
-			"bar",
-			"beauty_salon",
-			"bicycle_store",
-			"book_store",
-			"bowling_alley",
-			"cafe",
-			"casino",
-			"clothing_store",
-			"department_store",
-			"florist",
-			"gym",
-			"hair_care",
-			"library",
-			"movie_rental",
-			"movie_theater",
-			"museum",
-			"night_club",
-			"park",
-			"restaurant",
-			"shopping_mall",
-			"spa",
-			"stadium",
-			"zoo"
-		]
 
+		//setting localstorage if it doesn't exist (akin to a singleton design pattern)
 		if (localStorage.getItem('savedLocs') === null){localStorage.setItem('savedLocs',JSON.stringify([]))}
 	}
 
+	//annonymous function for sorting icons with regexes
 	iconSorter = () => {
 		var cond = this.state.cond
 		console.log("cond: "+cond);
@@ -152,6 +116,7 @@ export default class Iphone extends React.Component {
 		}
 	}
 
+	//function for formatting date for chart
 	formatAMPM = (date) => {
 		var hours = date.getHours();
 		var minutes = date.getMinutes();
@@ -163,10 +128,12 @@ export default class Iphone extends React.Component {
 		return strTime;
 	}
 
+	//function to deal with the hourly openweather API call (for the chart and cards)
 	parseHResponse = (parsed_json) => {
 		var arr = [];
 		var arr2 = [];
 		var days = [];
+		
 		for (let index = 0; index < 5; index++) {
 			var names = parsed_json['hourly'][index.toString()]['temp'];
 			var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
@@ -187,6 +154,7 @@ export default class Iphone extends React.Component {
 		});      
 	}
 
+	//function to deal with the one time openweather API call for the weather information (not the chart or cards)
 	parseWResponse = (parsed_json) => {
 		let location = parsed_json['name'];
 		let temp_c = Math.round(parsed_json['main']['temp']);
@@ -203,6 +171,7 @@ export default class Iphone extends React.Component {
 		let clouds = parsed_json['clouds']['all'];
 
 		let sunriseSunset = {sunrise: parsed_json['sys']['sunrise'], sunset: parsed_json['sys']['sunset']}
+
 		// set states for fields so they could be rendered later on
 		this.setState({
 			locate: location,
@@ -221,16 +190,7 @@ export default class Iphone extends React.Component {
 		});      
 	}
 
-	parseGResponse = (parsed_json) => {
-		const val = Math.floor(Math.random() * 11);
-		var rec = Math.round(parsed_json['results'][String(val)]['name']);
-
-		// set states for fields so they could be rendered later on
-		this.setState({
-			recommendation: rec,
-		});      
-	}
-
+	//fetches hourly and daily data for use with the chart + cards
 	fetchHourly = async(latitude,longitude) => {
 		var url = "http://api.openweathermap.org/data/2.5/onecall?lat="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
 		
@@ -242,13 +202,10 @@ export default class Iphone extends React.Component {
 			async: true,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
-		// once the data grabbed, hide the button
-		this.setState({ display: false });
 	}
 
+	//fetches one time data for use with the main info
 	fetchWeatherData = async(latitude, longitude) => {
-		// API URL with a structure of : ttp://api.wunderground.com/api/key/feature/q/country-code/city.json
-		//http://api.openweathermap.org/data/2.5/weather?lat=
 		var url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=Metric&appid="+APIKEY;
 		console.log(url);
 
@@ -260,10 +217,9 @@ export default class Iphone extends React.Component {
 			async: true,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
-		// once the data grabbed, hide the button
-		this.setState({ display: false });
 	}
 
+	//method that runs before the first render (used to set the initial statea)
 	componentWillMount() {
 		clearTimeout(this.redirectTimeout);
 		this.setState({ 
@@ -283,6 +239,7 @@ export default class Iphone extends React.Component {
 			savedLocations: [],
 		});
 
+		//calls for the fetches happen here (so when the page loads, we get the data)
 		if (!navigator.geolocation){
 			this.setState({statusText: 'Your browser does not support geolocation...'});
 		}
@@ -300,10 +257,12 @@ export default class Iphone extends React.Component {
 		}
 	}
 
+	//checks whether it is day or night (for bg + icons)
 	isDay() {
 		return (Date.now() + 60000 * new Date().getTimezoneOffset() + 21600000) % 86400000 / 3600000 > 12;
 	}
 
+	//picks backgrounds depending on the weather state
 	pickBG(){
 		if (!(this.isDay())){
 			return bg[1];
@@ -319,7 +278,7 @@ export default class Iphone extends React.Component {
 		}
 	}
 
-	//! will get back to sort out the recommendations & loading
+	//sets timer for 5 minutes to change tooltips (method called AFTER first render)
 	componentDidMount(){
 		this.timeout = setInterval(() => {
 			let currentIdx = this.state.textIdx;
@@ -327,10 +286,12 @@ export default class Iphone extends React.Component {
 		}, 300000);
 	}
 
+	//after refresh, clear timeout
 	componentDidUnmount() {
 		clearInterval(this.timeout);
 	}
 
+	//helper function to check if item exists in localstorage (using simple linear search)
 	containsObject(obj, list) {
 		var i;
 		for (i = 0; i < list.length; i++) {
@@ -342,6 +303,7 @@ export default class Iphone extends React.Component {
 		return false;
 	}
 
+	//parent function to handle child return value
 	handleCallback = (childData) =>{
 		if (!this.containsObject(childData,this.state.savedLocations)){
 			this.state.savedLocations.push(childData);
@@ -351,6 +313,7 @@ export default class Iphone extends React.Component {
 	
 	// the main render method for the iphone component
 	render() {
+		//data for the chartjs line graph
 		const data = {
 			labels: this.state.hourlyTime,
 			datasets: [
@@ -371,6 +334,7 @@ export default class Iphone extends React.Component {
 			
 		}
 		
+		//options for the chartjs line graph
 		const options = {
 			tooltips: {enabled: false},
 			events: [],
@@ -420,6 +384,7 @@ export default class Iphone extends React.Component {
 			},
 		}
 
+		//custom plugin for the line graph (for the bottom lines)
 		const plugins = {
 			afterRender: function(c, options) {
 				let meta = c.getDatasetMeta(0),max;
@@ -440,13 +405,14 @@ export default class Iphone extends React.Component {
 		}
 
 		// check if temperature data is fetched, if so add the sign styling to the page
-		//console.log(this.state);
 		const tempStyles = this.state.temp ? `${'temperature'} ${'filled'}` : "temperature";
+		//tooltips text is defined here (randomly picked each time)
 		let textThatChanges = tooltips[this.state.textIdx % tooltips.length];
 		
 		// display all weather data
 		return (
 			<>
+			{/* activates starfield animation if it is night-time */}
 			{
 				(!(this.isDay()))? (
 				<StarfieldAnimation
@@ -458,11 +424,11 @@ export default class Iphone extends React.Component {
 					}}
 				/> 
 				) : (
-					null//<Sun/>
+					null
 				)
-	}
+			}
+			{/* picks background depending on weather condition */}
 				<div className={ 'container '+this.pickBG() }>
-					{/* class={ style_iphone.button } clickFunction={ this.fetchWeatherData }/ > */}
 					<div id = "he1" className={ "header"}>
 					<Router>
 						<Navbar />
