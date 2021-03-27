@@ -130,29 +130,48 @@ export default class Iphone extends React.Component {
 
 	//function to deal with the hourly openweather API call (for the chart and cards)
 	parseHResponse = (parsed_json) => {
-		var arr = [];
-		var arr2 = [];
-		var days = [];
-		
-		for (let index = 0; index < 5; index++) {
-			var names = parsed_json['hourly'][index.toString()]['temp'];
-			var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
+        var arr = [];
+        var arr2 = [];
+        var arr3 = [];
+        var arr4 = [];
+        var arr5 = [];
+        var arr6 = [];
+        var days = [];
 
-			arr.push(names);
-			arr2.push(times);
-		}
+        for (let index = 0; index < 5; index++) {
+            var names = parsed_json['hourly'][index.toString()]['temp'];
+            var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
+            arr.push(names);
+            arr2.push(times);
+        }
+        for (let index = 5; index < 10; index++) {
+            var names = parsed_json['hourly'][index.toString()]['temp'];
+            var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
+            arr3.push(names);
+            arr4.push(times);
+        }
+        for (let index = 10; index < 15; index++) {
+            var names = parsed_json['hourly'][index.toString()]['temp'];
+            var times = this.formatAMPM(new Date(parsed_json['hourly'][index.toString()]['dt'] * 1000));
+            arr5.push(names);
+            arr6.push(times);
+        }
 
-		for (let index = 0; index <= 7; index++) {
-			days.push({'temp': parsed_json['daily'][index.toString()]['temp']['day'], 'time': this.formatAMPM(new Date(parsed_json['daily'][index.toString()]['dt'] * 1000)), 'weather': [{icon: parsed_json['daily'][index.toString()]['weather']['0']['icon']}, {'name': parsed_json['daily'][index.toString()]['weather']['0']['main']}]});
-		}
+        for (let index = 0; index <= 7; index++) {
+            days.push({'temp': parsed_json['daily'][index.toString()]['temp']['day'], 'time': this.formatAMPM(new Date(parsed_json['daily'][index.toString()]['dt'] * 1000)), 'weather': [{icon: parsed_json['daily'][index.toString()]['weather']['0']['icon']}, {'name': parsed_json['daily'][index.toString()]['weather']['0']['main']}]});
+        }
 
-		// set states for fields so they could be rendered later on
-		this.setState({
-			hourlyTemp: arr,
-			hourlyTime: arr2,
-			futureDays: days,
-		});      
-	}
+        // set states for fields so they could be rendered later on
+        this.setState({
+            hourlyTemp: arr,
+            hourlyTime: arr2,
+            hourlyTemp1: arr3,
+            hourlyTime1: arr4,
+            hourlyTemp2: arr5,
+            hourlyTime2: arr6,
+            futureDays: days,
+        });
+    }
 
 	//function to deal with the one time openweather API call for the weather information (not the chart or cards)
 	parseWResponse = (parsed_json) => {
@@ -314,25 +333,64 @@ export default class Iphone extends React.Component {
 	// the main render method for the iphone component
 	render() {
 		//data for the chartjs line graph
-		const data = {
-			labels: this.state.hourlyTime,
-			datasets: [
-				{
-				pointRadius: 1.5,
-				pointHoverRadius: 0,
-				data: this.state.hourlyTemp,
-				fill: false,
-				backgroundColor: 'rgb(255,255,255)',
-				borderColor: 'rgba(255,255,255,0.5)',
-				borderDash: [5],
-				borderWidth: 1,
-				datalabels: {
-					color: 'white',
-				}
-				},
-			],
-			
-		}
+		 //data for the chartjs line graph
+		 const data = {
+            labels: this.state.hourlyTime,
+            datasets: [
+                {
+                pointRadius: 1.5,
+                pointHoverRadius: 0,
+                data: this.state.hourlyTemp,
+                fill: false,
+                backgroundColor: 'rgb(255,255,255)',
+                borderColor: 'rgba(255,255,255,0.5)',
+                borderDash: [5],
+                borderWidth: 1,
+                datalabels: {
+                    color: 'white',
+                }
+                },
+            ],
+
+        }
+        const data2 = {
+            labels: this.state.hourlyTime1,
+            datasets: [
+                {
+                pointRadius: 1.5,
+                pointHoverRadius: 0,
+                data: this.state.hourlyTemp1,
+                fill: false,
+                backgroundColor: 'rgb(255,255,255)',
+                borderColor: 'rgba(255,255,255,0.5)',
+                borderDash: [5],
+                borderWidth: 1,
+                datalabels: {
+                    color: 'white',
+                }
+                },
+            ],
+
+        }
+        const data3 = {
+            labels: this.state.hourlyTime2,
+            datasets: [
+                {
+                pointRadius: 1.5,
+                pointHoverRadius: 0,
+                data: this.state.hourlyTemp2,
+                fill: false,
+                backgroundColor: 'rgb(255,255,255)',
+                borderColor: 'rgba(255,255,255,0.5)',
+                borderDash: [5],
+                borderWidth: 1,
+                datalabels: {
+                    color: 'white',
+                }
+                },
+            ],
+
+        }
 		
 		//options for the chartjs line graph
 		const options = {
@@ -415,14 +473,7 @@ export default class Iphone extends React.Component {
 			{/* activates starfield animation if it is night-time */}
 			{
 				(!(this.isDay()))? (
-				<StarfieldAnimation
-					style={{
-						pointerEvents: 'none',
-						position: 'absolute',
-						width: '100%',
-						height: '100%',
-					}}
-				/> 
+				<StarfieldAnimation className="starfield"/> 
 				) : (
 					null
 				)
@@ -456,12 +507,12 @@ export default class Iphone extends React.Component {
                                                 </div>
                                                 <div style={Object.assign({})}>
                                                     <div class="chartAreaWrapper">
-                                                        <Line data={data} options={options} plugins={[datalabels,plugins]} />
+                                                        <Line data={data2} options={options} plugins={[datalabels,plugins]} />
                                                     </div>
                                                 </div>
                                                 <div style={Object.assign({})}>
                                                     <div class="chartAreaWrapper">
-                                                        <Line data={data} options={options} plugins={[datalabels,plugins]} />
+                                                        <Line data={data3} options={options} plugins={[datalabels,plugins]} />
                                                     </div>
                                                 </div>
                                             </SwipeableViews>

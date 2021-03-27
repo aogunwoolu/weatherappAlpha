@@ -44,7 +44,7 @@ class Days extends React.Component {
         this.menuItems = Menu(list.slice(1, 8));
     }
 
-    //on update of the component, refresh days & display items
+    //on update of the component, refresh days & display
     render(){
     this.refreshDays();
     const menu = this.menuItems;

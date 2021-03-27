@@ -93,35 +93,34 @@
 }
 
 .starfield{
-    pointer-events: 'none';
-    position: 'absolute';
-    width: '100%';
-    height: '100%';
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
 .fimg{
-    pointer-events: 'none';
-    margin-top: 5px;
+    pointer-events: none;
+    margin-top: 45px;
     float: center;
     width: 250px;
 }
 
 .fimg2{
     width: 250px;
-    pointer-events: 'none';
+    pointer-events: none;
     margin-top: 50px;
     float: center;
 }
 
 .floatOVer{
-    pointer-events: 'none';
     width: 390px;
     height: 200px;
     position: relative;
 }
 
 .floatOVer2{
-    pointer-events: 'none';
+    pointer-events: none;
     top: 70px;
     width: 390px;
     height: 200px;
