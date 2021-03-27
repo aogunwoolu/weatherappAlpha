@@ -1,5 +1,6 @@
 import React from 'react';
 
+//map page component
 function Products() {
   return (
     <div className='products'>

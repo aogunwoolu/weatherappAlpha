@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import * as FaIcons from 'react-icons/fa';
 import * as AiIcons from 'react-icons/ai';
 import * as HiIcons from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -7,17 +6,17 @@ import { SidebarData } from './SidebarData';
 import './navbar.css';
 import { IconContext } from 'react-icons';
 
-
+//navigation bar definition
 function Navbar() {
+  //sidebar active state
   const [sidebar, setSidebar] = useState(false);
 
+  //function to change state
   const showSidebar = () => {
     setSidebar(!sidebar); 
-    // if (sidebar){
-    //   refreshPage();
-    // }
   };
 
+  //display element
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>

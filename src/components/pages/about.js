@@ -1,4 +1,5 @@
 function About() {
+    //about page component
     return(
         <>
             <p class="line-1 anim-typewriter">credits to</p>

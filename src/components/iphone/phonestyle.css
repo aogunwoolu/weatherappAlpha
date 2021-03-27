@@ -10,6 +10,8 @@
 	height: 1450px;
 	text-align: center;
 
+    top: 0px;
+
 	margin: 0 auto;
     color: white;
 
@@ -67,13 +69,15 @@
     font-size: 1em;
     font-weight: 350;	
 }
-.conditions {
+.weather{
     flex: 1;
+}
+.conditions {
     font-size: 1em;
 }
 .temperature {
     flex: 2;
-    margin-top: 0;
+    margin-top: 200px;
     font-size: 5.2em;
     font-weight: 300;
     letter-spacing: -7px;
@@ -97,13 +101,15 @@
 
 .fimg{
     pointer-events: 'none';
-    margin-top: -25px;
+    margin-top: 5px;
     float: center;
+    width: 250px;
 }
 
 .fimg2{
+    width: 250px;
     pointer-events: 'none';
-    margin-top: -100px;
+    margin-top: 50px;
     float: center;
 }
 
@@ -116,15 +122,16 @@
 
 .floatOVer2{
     pointer-events: 'none';
+    top: 70px;
     width: 390px;
     height: 200px;
-    position: relative;
+    position: absolute;
 }
 
 .floating2{
     float: center;
     position: absolute;
-    top: 210px;
+    top: 290px;
     width: inherit;
     z-index: 1000;
     color: #FFFFFF;
@@ -192,16 +199,40 @@
     text-align: center;
   }
 
+.del{
+    position:relative;
+    top: 3rem;
+}
+
 .split{
     display:flex;
 }
 
+.moreInfo{
+    margin-left: 70px;
+}
+
+.savedItem{ 
+    background-color: 'rgb(6,11,38,0.2)';
+    display: 'block';
+    overflow: 'auto';
+    border-radius: '50px';
+    padding:'0';
+    margin: '10px 5px 5px 0px';
+}
+
 .left{
-    margin-left: 8px;
-    flex: 1;
+    flex: 10 10 10;
 }
 .right{
     flex: 1;
+}
+
+.Dleft{
+    width: 90%;
+}
+.Dright{
+    width: 15px;
 }
 
 .itm p:first-of-type{

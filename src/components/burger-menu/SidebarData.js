@@ -4,6 +4,7 @@ import * as FiIcons from 'react-icons/fi';
 import * as AiIcons from 'react-icons/ai';
 import * as IoIcons from 'react-icons/io';
 
+//data for the side bar components (paths, titles, icons, etc.)
 export const SidebarData = [
   {
     title: 'Whether?',

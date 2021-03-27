@@ -2,25 +2,29 @@ import React from 'react';
 import Day from './day';
 import ScrollMenu from "react-horizontal-scrolling-menu";
 
+//global list
 let list = [
-
 ];
 
+//mapping the list items to Day objects
 export const Menu = (list) =>
     list.map(el => {
 
     return <Day text={el["name"]} temp={el["temp"]} icn={el["img"]} dsc={el["desc"]} key={el["name"]} />;
 });
 
+//Days component definition
 class Days extends React.Component {
     curr = new Date; // get current 
 
+    //setting instance variables
     constructor(props) {
         super(props);
         this.menu = null;
         this.refreshDays();
     }
 
+    //recreates day array for display
     refreshDays(){
         var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -40,10 +44,7 @@ class Days extends React.Component {
         this.menuItems = Menu(list.slice(1, 8));
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        this.refreshDays();
-    }
-
+    //on update of the component, refresh days & display items
     render(){
     this.refreshDays();
     const menu = this.menuItems;

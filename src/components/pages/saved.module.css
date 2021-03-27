@@ -1,0 +1,8 @@
+.card{
+    background-color: rgb(6,11,38,0.2);
+    display: block; 
+    overflow: auto;
+    border-radius: 50px;
+    padding: 0; 
+    margin: 10px 5px 5px 0px;
+}

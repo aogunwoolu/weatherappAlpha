@@ -474,7 +474,7 @@ export default class Iphone extends React.Component {
 											<Days futureDays={this.state.futureDays}/>
 											<p>more information</p>
 											<div className="info">
-												<div className="split">
+												<div className="split moreInfo">
 													<div className="left">
 														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{this.state.humidity}%</p></div>
 														<div className="itm"><p><WiIcns.WiBarometer/>pressure</p><p>{this.state.pressure}hPa</p></div>

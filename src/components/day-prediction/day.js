@@ -1,10 +1,12 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './day.module.css';
 
+//day component definition (with information passed from upper level - Days)
 const Day =(props)=> {
     return (
-            <Card style={{ backgroundColor: 'rgb(6,11,38,0.2)', width: '10rem', height: '15rem', margin: '30px 10px 30px 10px', }}>
+            <Card className={styles.card}>
             <Card.Body style={{color: 'white', }}>
                 <Card.Title style={{textAlign: 'center'}}>{props.text}</Card.Title>
                 <Card.Text style={{textAlign: 'center', size: '5px', }}>

@@ -388,12 +388,12 @@ const SearchPage = (props) => {
       {
         (dataGot)? (
           <div className={ "body" }>
-            <div className={ "conditions2" }><strong>{ weatherData.cond }</strong></div>
               <div className={"floatOVer2"}>
+              <div className={ "weather2" }><strong>{ weatherData.cond }</strong></div>
                 <img className={ "fimg2" } src={iconSorter()} onError={console.log("couldn't find icon")}/>
                 <div className={"floating2"}>
                   <span className={ tempStyles }>{ weatherData.temp }</span>
-                  <div className={ "conditions" }>{DateTime.now().toFormat('DDDD')}</div>
+                  <div className={ "conditions weather2" }>{DateTime.now().toFormat('DDDD')}</div>
                   <div class="chartAreaWrapper">
                     <Line data={data} options={options} plugins={[datalabels,plugins]} />
                   </div>
@@ -406,7 +406,7 @@ const SearchPage = (props) => {
                   <Days futureDays={futureData.futureDays}/>
                   <p>more information</p>
                   <div className="info">
-												<div className="split">
+												<div className="split moreInfo">
 													<div className="left">
 														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{weatherData.humidity}%</p></div>
 														<div className="itm"><p><WiIcns.WiBarometer/>pressure</p><p>{weatherData.pressure}hPa</p></div>
@@ -418,10 +418,10 @@ const SearchPage = (props) => {
 														<div className="itm"><p><WiIcns.WiCloud/>cloudiness</p><p>{weatherData.clouds}%</p></div>
 													</div>
 												</div>
-											</div>
+									</div>
                 </div>
-              </div>
             </div>
+          </div>
             ):(
               <div>
                 <p style={{textAlign: 'center'}}>type a place</p>
