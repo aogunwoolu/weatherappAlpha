@@ -9,7 +9,6 @@ import * as AiIcns from 'react-icons/ai';
 import * as WiIcns from 'react-icons/wi';
 import * as RiIcns from 'react-icons/ri';
 import * as MdIcns from 'react-icons/md';
-import 'reactjs-popup/dist/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import datalabels from 'chartjs-plugin-datalabels';
@@ -79,11 +78,9 @@ export default class Iphone extends React.Component {
 		if (localStorage.getItem('savedLocs') === null){localStorage.setItem('savedLocs',JSON.stringify([]))}
 	}
 
-	//annonymous function for sorting icons with regexes
+	//anonymous function for sorting icons with regexes
 	iconSorter = () => {
 		var cond = this.state.cond
-		console.log("cond: "+cond);
-		console.log(CLRegex.test(cond));
 
 		if (TSRegex.test(cond)){
 			return thunder
@@ -186,7 +183,7 @@ export default class Iphone extends React.Component {
 		let min =  Math.round(parsed_json['main']['temp_min']);
 		let max = Math.round(parsed_json['main']['temp_max']);
 		let vis = parsed_json['visibility'];
-		let wind = parsed_json['wind'];
+		let windSpeed = parsed_json['wind']['speed'];
 		let clouds = parsed_json['clouds']['all'];
 
 		let sunriseSunset = {sunrise: parsed_json['sys']['sunrise'], sunset: parsed_json['sys']['sunset']}
@@ -204,7 +201,7 @@ export default class Iphone extends React.Component {
 			min: min,
 			max: max,
 			vis: vis,
-			wind: wind,
+			wind: windSpeed,
 			clouds: clouds,
 		});      
 	}
@@ -226,7 +223,6 @@ export default class Iphone extends React.Component {
 	//fetches one time data for use with the main info
 	fetchWeatherData = async(latitude, longitude) => {
 		var url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=Metric&appid="+APIKEY;
-		console.log(url);
 
 		await
 		$.ajax({
@@ -267,7 +263,6 @@ export default class Iphone extends React.Component {
 			var lat = position.coords.latitude;
 			var longitude = position.coords.longitude;
 			this.setState({longitude: longitude, latitude: lat});
-			//console.log('Successfully found you at ' + this.state.latitude + ',' + this.state.longitude);
 			this.fetchWeatherData(this.state.latitude, this.state.longitude);
 			this.fetchHourly(this.state.latitude, this.state.longitude);
 			
@@ -333,8 +328,7 @@ export default class Iphone extends React.Component {
 	// the main render method for the iphone component
 	render() {
 		//data for the chartjs line graph
-		 //data for the chartjs line graph
-		 const data = {
+		const data = {
             labels: this.state.hourlyTime,
             datasets: [
                 {
@@ -533,7 +527,7 @@ export default class Iphone extends React.Component {
 													</div>
 													<div className="right">
 														<div className="itm"><p><MdIcns.MdVisibility/>visibility</p><p>{this.state.vis}m</p></div>
-														<div className="itm"><p><WiIcns.WiHumidity/>wind</p><p>100000</p></div>
+														<div className="itm"><p><WiIcns.WiStrongWind/>wind speed</p><p>{this.state.wind}</p></div>
 														<div className="itm"><p><WiIcns.WiHumidity/>humidity</p><p>{this.state.humidity}%</p></div>
 													</div>
 												</div>
@@ -544,7 +538,7 @@ export default class Iphone extends React.Component {
 								<br/>
 							</Route>
 							<Route exact path="/about" component={About} />
-							<Route exact path="/map" component={Suggestions} />
+							<Route exact path="/map" component={(props) => (<Suggestions {...props} lat={this.state.latitude} lng={this.state.longitude}/>)} />
 							<Route exact path="/search" render={(props) => (<SearchPage {...props} parentCallback = {this.handleCallback}/>)} />
 							<Route exact path="/saved" render={(props) => (<SavedPage {...props} saved={this.state.savedLocations}/>)} />
 						</Switch>

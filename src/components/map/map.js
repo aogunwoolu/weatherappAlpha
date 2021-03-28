@@ -2,10 +2,11 @@ import { Map, GoogleApiWrapper, InfoWindow, Marker } from 'google-maps-react';
 import React, { Component } from 'react';
 const GMAPIKEY = 'AIzaSyDrHsODQZr_cmpAAouZPySakfv4BY2bFdc';
 
-const mapStyles = {
-    width: '100%',
-    height: '100%'
-};
+// const mapStyles = {
+//     position: 'relative',
+//     width: '380px',
+//     height: '590px'
+// };
 
 export class MapContainer extends Component {
     state = {
@@ -32,20 +33,18 @@ export class MapContainer extends Component {
 
     render() {
         return (
-            <Map
-                google={this.props.google}
-                zoom={14}
-                style={mapStyles}
+            <div style={{ position: 'absolute', height: '85%', width: '95%', }}>
+            <Map google={this.props.google} zoom={14} style={{color: 'black'}}
                 initialCenter={
                 {
-                    lat: -1.2884,
-                    lng: 36.8233
+                    lat: this.props.lat,
+                    lng: this.props.lng
                 }
                 }
             >
                 <Marker
                     onClick={this.onMarkerClick}
-                    name={'Kenyatta International Convention Centre'}
+                    name={'you are here'}
                 />
                 <InfoWindow
                     marker={this.state.activeMarker}
@@ -57,6 +56,7 @@ export class MapContainer extends Component {
                 </div>
                 </InfoWindow>
             </Map>
+            </div>
         );
     }
 }

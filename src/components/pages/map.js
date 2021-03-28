@@ -1,10 +1,12 @@
 import React from 'react';
+import MapContainer from '../map/map'
 
 //map page component
-function Products() {
+function Products(props) {
   return (
     <div className='products'>
-      <h1>Map</h1>
+      <h2>Map</h2>
+      <MapContainer lat={props.lat} lng={props.lng} />
     </div>
   );
 }

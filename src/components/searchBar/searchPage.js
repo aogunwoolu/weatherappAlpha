@@ -26,26 +26,32 @@ import snow from '../../assets/icons/Snow.svg';
 import thunder from '../../assets/icons/ThunderStorm.svg';
 
 
+//functional version of main page (without swipe-able chart or background change)
 import $ from 'jquery';
+
+//API keys for openweather + google APIs
 const APIKEY = 'bceb51cbee4b751cc43eefea844fa6bf';
+
+//regular expressions to check against conditions (in multiple places)
 const TSRegex = /(.*)thunderstorm(.*)/;
 const DRegex = /(.*)drizzle(.*)/;
 const RRegex = /(.*)rain(.*)/;
 const SRegex = /(.*)snow(.*)/;
 const CRegex = /(.*)clear(.*)/;
 const CLRegex = /(.*)clouds(.*)/;
+
+//importing date for later use
 var { DateTime } = require('luxon');
 
-// const bg = [
-// 	"rain",
-// 	"night",
-// 	"sunset",
-// 	"day",
-// ];
-
+//seachPage functional component
 const SearchPage = (props) => {
+  //state to see if data has been fetched from saved page
   const [dataGot, setdataGot] = React.useState(false);
+
+  //address being typed
   const [address, setAddress] = React.useState("");
+
+  //weather data state
   const [weatherData, setWeatherData] = React.useState({
     locate: "",
 		temp: 0,
@@ -61,28 +67,28 @@ const SearchPage = (props) => {
 		wind: 0,
 		clouds: 0,
   });
+
+  //hourly + day data state
   const [futureData, setFutureData] = React.useState({
     hourlyTemp: [],
 		hourlyTime: [],
 		futureDays: [],
   });
+
+  //coordinate state
   const [coordinates, setCoordinates] = React.useState({
     lat: null,
     lng: null
   });
 
+  //checks whether it is day or night (for bg + icons)
   const isDay = () => {
 		return (Date.now() + 60000 * new Date().getTimezoneOffset() + 21600000) % 86400000 / 3600000 > 12;
 	}
 
+  //anonymous function for sorting icons with regexes
   const iconSorter = () => {
 		var cond = weatherData.cond
-		console.log("cond: "+cond);
-		console.log(CLRegex.test(cond));
-
-    // if (!(this.isDay())){
-    //   document.getElementsByClassName("container").className = document.getElementsByClassName("container").className.replace( /(?:^|\s)MyClass(?!\S)/g , '' )
-    // }
 
 		if (TSRegex.test(cond)){
 			return thunder
@@ -115,11 +121,11 @@ const SearchPage = (props) => {
 		}
 	}
 
+
   const handleSelect = async value => {
     const results = await geocodeByAddress(value);
     const latLng = await getLatLng(results[0]);
 
-    console.log(latLng);
     setAddress(value);
     setCoordinates(latLng);
     setdataGot(true);
@@ -139,6 +145,7 @@ const SearchPage = (props) => {
 		return strTime;
 	}
 
+  //function to deal with the hourly openweather API call (for the chart and cards)
 	const parseHResponse = (parsed_json) => {
 		var arr = [];
 		var arr2 = [];
@@ -155,7 +162,6 @@ const SearchPage = (props) => {
 			days.push({'temp': parsed_json['daily'][index.toString()]['temp']['day'], 'time': formatAMPM(new Date(parsed_json['daily'][index.toString()]['dt'] * 1000)), 'weather': [{icon: parsed_json['daily'][index.toString()]['weather']['0']['icon']}, {'name': parsed_json['daily'][index.toString()]['weather']['0']['main']}]});
 		}
 
-		// set states for fields so they could be rendered later on
 		setFutureData({
 			hourlyTemp: arr,
 			hourlyTime: arr2,
@@ -163,6 +169,7 @@ const SearchPage = (props) => {
 		});      
 	}
 
+  //function to deal with the one time openweather API call for the weather information (not the chart or cards)
 	const parseWResponse = (parsed_json) => {
 		let location = parsed_json['name'];
 		let temp_c = Math.round(parsed_json['main']['temp']);
@@ -179,7 +186,7 @@ const SearchPage = (props) => {
 		let clouds = parsed_json['clouds']['all'];
 
 		let sunriseSunset = {sunrise: parsed_json['sys']['sunrise'], sunset: parsed_json['sys']['sunset']}
-		// set states for fields so they could be rendered later on
+
 		setWeatherData({
 			locate: location,
 			temp: temp_c,
@@ -197,6 +204,7 @@ const SearchPage = (props) => {
 		});      
 	}
 
+  //fetches hourly and daily data for use with the chart + cards
   const fetchHourly = (latitude,longitude) => {
 		var url = "http://api.openweathermap.org/data/2.5/onecall?lat="+latitude+"&lon="+longitude+"&exclude=current,minutely,alerts&units=Metric&appid="+APIKEY;
 		
@@ -209,9 +217,8 @@ const SearchPage = (props) => {
 		})
 	}
 
+  //fetches one time data for use with the main info
 	const fetchWeatherData = (latitude, longitude) => {
-		// API URL with a structure of : ttp://api.wunderground.com/api/key/feature/q/country-code/city.json
-		//http://api.openweathermap.org/data/2.5/weather?lat=
 		var url = "http://api.openweathermap.org/data/2.5/weather?lat="+latitude+"&lon="+longitude+"&units=Metric&appid="+APIKEY;
 
 		$.ajax({
@@ -221,10 +228,9 @@ const SearchPage = (props) => {
 			async: true,
 			error : function(req, err){ console.log('API call failed ' + err + ', ' + APIKEY); }
 		})
-		// once the data grabbed, hide the button
 	}
 
-
+  //data for the chartjs line graph
   const data = {
     labels: futureData.hourlyTime,
     datasets: [
@@ -245,6 +251,7 @@ const SearchPage = (props) => {
     
   }
   
+  //options for the chartjs line graph
   const options = {
     tooltips: {enabled: false},
     events: [],
@@ -294,8 +301,7 @@ const SearchPage = (props) => {
     },
   }
 
-  
-
+  //custom plugin for the line graph (for the bottom lines)
   const plugins = {
     afterRender: function(c, options) {
       let meta = c.getDatasetMeta(0),max;
@@ -316,9 +322,9 @@ const SearchPage = (props) => {
   }
 
   // check if temperature data is fetched, if so add the sign styling to the page
-  //console.log(this.state);
   const tempStyles = weatherData.temp ? `${'temperature'} ${'filled'}` : "temperature";
 
+  //one save button click, save to saved page
   const handleClick =(e)=> {
     props.parentCallback({"name": address, "lat": coordinates.lat, "lng": coordinates.lng});
     let locs = JSON.parse(localStorage.getItem('savedLocs'));
@@ -330,8 +336,8 @@ const SearchPage = (props) => {
     
   }
 
+  //called when component updates (calls API fetching)
   useEffect( () => {
-    console.log(props);
     if (props.location.loc !== undefined){
       setAddress(props.location.loc.name);
       setCoordinates({lat: props.location.loc.lat, lng: props.location.loc.lng});
@@ -342,6 +348,7 @@ const SearchPage = (props) => {
     }
   }, []);
   
+  //displaying component
   return (
     <div>
       <PlacesAutocomplete
